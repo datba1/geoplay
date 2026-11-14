@@ -1,0 +1,59 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// A browser/device. No sign-in: the id is a UUID generated on the client.
+model Player {
+  id        String   @id @db.Uuid
+  nickname  String   @db.VarChar(24)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  scores    Score[]
+}
+
+model Score {
+  id        Int      @id @default(autoincrement())
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId  String   @db.Uuid
+  gameSlug  String   @db.VarChar(40)
+  points    Int
+  /// YYYY-MM-DD when the score was part of that day's challenge
+  dayKey    String?  @db.VarChar(10)
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([gameSlug, points])
+  @@index([createdAt])
+  @@index([dayKey])
+}
+
+/// "Did you know?" flip cards
+model Fact {
+  id         Int    @id @default(autoincrement())
+  category   String @db.VarChar(20)
+  questionEn String
+  answerEn   String
+  detailEn   String
+  questionVi String
+  answerVi   String
+  detailVi   String
+  source     String?
+}
+
+/// Latest World Bank value per country and indicator (filled by `npm run data:worldbank`).
+model CountryStat {
+  iso2      String   @db.VarChar(2)
+  indicator String   @db.VarChar(40)
+  year      Int
+  value     Float
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@id([iso2, indicator])
+  @@index([indicator])
+}

@@ -1,0 +1,290 @@
+'use client';
+
+import { GAME_TEXT } from './gameText';
+
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+
+export type Lang = 'en' | 'vi';
+export const LANGS: { code: Lang; label: string; flag: string }[] = [
+  { code: 'en', label: 'English', flag: 'gb' },
+  { code: 'vi', label: 'Tiếng Việt', flag: 'vn' },
+];
+
+const en = {
+  'game.warped-map.kind': 'Quiz',
+  'game.warped-map.desc': 'The world swells and shrinks by a mystery statistic. Read the shapes and guess what it is.',
+  'wm.question': 'What is the map showing?',
+  'wm.help': 'Each country is resized around its centre so its area matches the statistic. Faint lines show the real borders.',
+  'wm.right': 'Correct!', 'wm.wrong': 'Not quite.', 'wm.timeout': 'Time’s up.',
+  'wm.source': 'Data: World Bank Open Data (latest available year per country).',
+  'wm.noData': 'No statistics in the database yet. Load World Bank data on the API side with:',
+  'wm.rules.1': 'The world map warps: every country grows or shrinks according to one hidden statistic.',
+  'wm.rules.2': 'Pick which statistic it is from four options. Faster answers score more.',
+  'wm.rules.3': '6 rounds, 20 seconds each. After each answer you see the top five countries.',
+  'nav.handbook': 'Handbook',
+  'collection.items': 'Items',
+  'collection.itemNext': 'Level {n} unlocks {name}',
+  'collection.stampsRecent': 'Latest stamps',
+  'col.itemsDesc': 'Collectibles unlocked as you level up.',
+  'col.locked': 'Level {n}',
+  'hb.eyebrow': 'New here?',
+  'hb.title': 'GeoPlay Handbook',
+  'hb.desc': 'Which game to play first, how hard each one is, how long it takes, and why maps “lie”.',
+  'hb.open': 'Open the handbook →',
+  'brand.sub': 'Geo games',
+  'nav.games': 'Games',
+  'nav.collection': 'Collection',
+  'nav.leaderboard': 'Leaderboard',
+  'nav.facts': 'Did you know',
+  'hero.tagline': 'see the world from a new angle',
+  'hero.lead': 'Squeeze countries at their true size, spot the sabotaged flag, sketch borders from memory. Every win stamps your passport.',
+  'hero.xp': '{xp} / {need} XP to level {next}',
+  'hero.play': 'Play today’s challenge',
+  'player.level': 'Level {level} · {tier} · {stamps} stamps',
+  'tier.bronze': 'Bronze', 'tier.silver': 'Silver', 'tier.gold': 'Gold', 'tier.platinum': 'Platinum',
+  'nick.title': 'Your', 'nick.titleEm': 'nickname',
+  'nick.desc': 'The name shown on the online leaderboard. No sign-in needed.',
+  'nick.placeholder': 'e.g. Map Wizard',
+  'nick.later': 'Later', 'nick.save': 'Save',
+  'nick.offline': 'Saved on this device. The leaderboard server could not be reached.',
+  'daily.eyebrow': 'Today’s challenge · {date}',
+  'daily.title': 'Three shared puzzles for everyone, a new set every day',
+  'daily.streak': '🔥 {n} days',
+  'daily.resets': 'new puzzles in {time}',
+  'daily.bonus': 'Finish all 3 for +50 XP and +1 streak day.',
+  'daily.offline': 'The challenge server is offline. Start the API to get today’s set.',
+  'daily.done': 'Today’s set complete!',
+  'fact.eyebrow': 'Did you know?',
+  'fact.flip': 'Tap to flip', 'fact.today': 'Today’s card', 'fact.all': 'See all cards →',
+  'fact.source': 'Source: {s}',
+  'collection.title': 'Your collection',
+  'collection.passport': 'Passport', 'collection.badges': 'Badges',
+  'collection.firstStamp': 'Win a game to earn your first stamp',
+  'collection.next': 'Next: {name}',
+  'collection.open': 'Open collection →',
+  'games.title': 'Games',
+  'games.maps': 'Maps', 'games.flags': 'Flags', 'games.strategy': 'Strategy', 'games.nature': 'Nature', 'games.soon': 'Coming soon',
+  'games.notPlayed': 'Not played', 'games.best': 'Best {n} · {plays} plays',
+  'game.true-size.name': 'True Size',
+  'game.true-size.kind': 'Packing',
+  'game.true-size.desc': 'Real sizes, no Mercator. How much of Europe fits inside Brazil?',
+  'game.flag-fault.name': 'Flag Fault',
+  'game.flag-fault.kind': 'Sharp eyes',
+  'game.flag-fault.desc': 'A familiar flag, secretly altered in one spot. Tap the error before time runs out.',
+  'game.border-sketch.name': 'Border Sketch',
+  'game.border-sketch.kind': 'Memory',
+  'game.border-sketch.desc': 'Just a country name and a blank sheet. Draw it from memory and see how close you get.',
+  'game.warped-map.name': 'Warped Map', 'game.globe-cut.name': 'Globe Cut',
+  'game.flag-painter.name': 'Flag Painter', 'game.border-go.name': 'Border Go', 'game.elements.name': 'Elements',
+  'common.back': '← All games', 'common.howTo': 'How to play', 'common.gotIt': 'Got it',
+  'common.playAgain': 'Play again', 'common.home': 'Home', 'common.next': 'Next',
+  'common.loading': 'Loading…', 'common.score': 'Score', 'common.round': 'Round', 'common.time': 'Time',
+  'common.daily': 'Daily challenge',
+  'result.title': 'Well played', 'result.xp': '+{n} XP', 'result.levelUp': 'Level up! → {n}',
+  'result.badge': 'New badge: {name}', 'result.stamps': '+{n} stamps', 'result.dailyDone': 'Daily set complete · streak {n}',
+  'result.submitted': 'Score sent to the leaderboard', 'result.offline': 'Leaderboard offline: progress saved locally',
+  'result.noNick': 'Set a nickname to appear on the leaderboard',
+  'ts.filled': 'Filled', 'ts.placed': 'Placed',
+  'ts.help': 'Drag countries from the tray into the frame · rotate with Q/E, the mouse wheel or the buttons',
+  'ts.challenge': 'Challenge', 'ts.change': 'Change challenge', 'ts.lock': 'Lock in result',
+  'ts.tray': 'Tray (drag into the frame)',
+  'ts.rule': 'A country counts when ≥ 90% of it is inside the frame and it doesn’t overlap another. Stars: 30% · 45% · 58%.',
+  'ts.rules.1': 'Each level gives you a big country as the frame and a tray of other countries, all at true scale (equal-area projection).',
+  'ts.rules.2': 'Drag and rotate pieces to fill as much of the frame as you can without overlaps.',
+  'ts.rules.3': 'Double-click or press Delete to send a piece back. Red pieces spill out or overlap.',
+  'ts.rotate': 'Rotate',
+  'ts.cTitle': '{tray} inside {frame}',
+  'ts.cDesc': '{frame} covers {area}. Squeeze in as many countries as you can.',
+  'ts.region.europe': 'Europe', 'ts.region.asia': 'Asia', 'ts.region.africa': 'Africa', 'ts.region.west-europe': 'Western Europe',
+  'ff.find': 'Find the fault in the flag of', 'ff.correct': 'Found it!', 'ff.timeout': 'Time’s up: here it was',
+  'ff.wrong': 'Not there (−3s)',
+  'ff.rules.1': 'Each round shows a well-known flag with exactly one thing changed: a wrong colour or a missing piece.',
+  'ff.rules.2': 'Tap the altered spot. Faster answers score more; wrong taps cost 3 seconds.',
+  'ff.rules.3': '8 flags per run, 15 seconds each.',
+  'bs.draw': 'Draw', 'bs.clear': 'Clear', 'bs.submit': 'Compare', 'bs.match': '{n}% match',
+  'bs.tooSmall': 'Draw one closed outline of the whole country first.',
+  'bs.rules.1': 'You get a country name. Draw its outline in one stroke; the shape closes itself.',
+  'bs.rules.2': 'Size and position don’t matter: shapes are scaled to the same area before comparing. Orientation does: north is up.',
+  'bs.rules.3': '5 countries per run; your score is the overlap percentage.',
+  'bs.legend': 'Coral line: the real outline',
+  'lb.title': 'Leaderboard', 'lb.overall': 'Overall', 'lb.all': 'All time', 'lb.week': 'This week', 'lb.day': 'Today (daily)',
+  'lb.rank': '#', 'lb.player': 'Player', 'lb.points': 'Points', 'lb.empty': 'No scores yet. Be the first!',
+  'lb.you': 'You', 'lb.offline': 'Could not reach the leaderboard server.',
+  'col.passportDesc': 'Every country you score in a game stamps your passport.',
+  'col.badgesDesc': 'Achievements unlocked by playing.',
+  'col.stamps': 'Stamps', 'col.level': 'Level', 'col.xp': 'Total XP', 'col.played': 'Games played',
+  'col.reset': 'Reset progress', 'col.resetConfirm': 'Reset all local progress on this device?',
+  'col.changeNick': 'Change nickname',
+  'facts.title': 'Did you know?',
+  'footer.about': 'Games for seeing the Earth anew through maps and flags. Every win adds a stamp to your passport.',
+  'footer.data': 'Data & credits',
+  'footer.disclaimer': 'Figures computed from simplified maps are approximate: made for play, not reference. Borders are illustrative.',
+  'footer.privacy': 'Progress is saved on this device. The leaderboard only receives your nickname and scores.',
+};
+
+export type DictKey = keyof typeof en;
+
+const vi: Record<DictKey, string> = {
+  'game.warped-map.kind': 'Đố vui',
+  'game.warped-map.desc': 'Thế giới phình ra rồi co lại theo một chỉ số bí ẩn. Đọc hình dạng và đoán xem đó là gì.',
+  'wm.question': 'Bản đồ đang thể hiện điều gì?',
+  'wm.help': 'Mỗi nước được phóng to hoặc thu nhỏ quanh tâm để diện tích khớp với chỉ số. Đường mờ là biên giới thật.',
+  'wm.right': 'Chính xác!', 'wm.wrong': 'Chưa đúng.', 'wm.timeout': 'Hết giờ.',
+  'wm.source': 'Dữ liệu: World Bank Open Data (năm gần nhất có số liệu của từng nước).',
+  'wm.noData': 'Cơ sở dữ liệu chưa có số liệu. Hãy tải dữ liệu World Bank ở phía API bằng lệnh:',
+  'wm.rules.1': 'Bản đồ thế giới bị bóp méo: mỗi nước to ra hoặc nhỏ lại theo một chỉ số bí ẩn.',
+  'wm.rules.2': 'Chọn đúng chỉ số trong bốn đáp án. Trả lời càng nhanh càng nhiều điểm.',
+  'wm.rules.3': '6 vòng, mỗi vòng 20 giây. Sau mỗi câu bạn sẽ thấy năm nước đứng đầu.',
+  'nav.handbook': 'Cẩm nang',
+  'collection.items': 'Vật phẩm',
+  'collection.itemNext': 'Cấp {n} mở khoá {name}',
+  'collection.stampsRecent': 'Con dấu mới nhất',
+  'col.itemsDesc': 'Vật phẩm sưu tầm mở khoá khi lên cấp.',
+  'col.locked': 'Cấp {n}',
+  'hb.eyebrow': 'Mới đến?',
+  'hb.title': 'Cẩm nang GeoPlay',
+  'hb.desc': 'Nên chơi trò nào trước, mỗi trò khó cỡ nào, mất bao lâu, và vì sao bản đồ “nói dối”.',
+  'hb.open': 'Mở cẩm nang →',
+  'brand.sub': 'Trò chơi địa lý',
+  'nav.games': 'Trò chơi', 'nav.collection': 'Bộ sưu tập', 'nav.leaderboard': 'Bảng xếp hạng', 'nav.facts': 'Có thể bạn chưa biết',
+  'hero.tagline': 'nhìn thế giới từ một góc mới',
+  'hero.lead': 'Xếp các nước theo kích thước thật, tìm lỗi trên lá cờ, vẽ biên giới theo trí nhớ. Mỗi chiến thắng thêm một con dấu vào hộ chiếu.',
+  'hero.xp': '{xp} / {need} XP để lên cấp {next}',
+  'hero.play': 'Chơi thử thách hôm nay',
+  'player.level': 'Cấp {level} · {tier} · {stamps} con dấu',
+  'tier.bronze': 'Đồng', 'tier.silver': 'Bạc', 'tier.gold': 'Vàng', 'tier.platinum': 'Bạch kim',
+  'nick.title': 'Biệt danh', 'nick.titleEm': 'của bạn',
+  'nick.desc': 'Tên hiển thị trên bảng xếp hạng trực tuyến. Không cần đăng nhập.',
+  'nick.placeholder': 'vd: Phù thủy bản đồ',
+  'nick.later': 'Để sau', 'nick.save': 'Lưu',
+  'nick.offline': 'Đã lưu trên thiết bị. Không kết nối được máy chủ bảng xếp hạng.',
+  'daily.eyebrow': 'Thử thách hôm nay · {date}',
+  'daily.title': 'Ba câu đố chung cho mọi người, bộ mới mỗi ngày',
+  'daily.streak': '🔥 {n} ngày',
+  'daily.resets': 'câu đố mới sau {time}',
+  'daily.bonus': 'Hoàn thành cả 3 để nhận +50 XP và +1 ngày chuỗi.',
+  'daily.offline': 'Máy chủ thử thách đang tắt. Hãy chạy API để nhận bộ câu đố hôm nay.',
+  'daily.done': 'Đã hoàn thành bộ hôm nay!',
+  'fact.eyebrow': 'Có thể bạn chưa biết',
+  'fact.flip': 'Chạm để lật', 'fact.today': 'Thẻ hôm nay', 'fact.all': 'Xem tất cả thẻ →',
+  'fact.source': 'Nguồn: {s}',
+  'collection.title': 'Bộ sưu tập của bạn',
+  'collection.passport': 'Hộ chiếu', 'collection.badges': 'Huy hiệu',
+  'collection.firstStamp': 'Thắng một trò chơi để nhận con dấu đầu tiên',
+  'collection.next': 'Tiếp theo: {name}',
+  'collection.open': 'Mở bộ sưu tập →',
+  'games.title': 'Trò chơi',
+  'games.maps': 'Bản đồ', 'games.flags': 'Lá cờ', 'games.strategy': 'Chiến thuật', 'games.nature': 'Thiên nhiên', 'games.soon': 'Sắp ra mắt',
+  'games.notPlayed': 'Chưa chơi', 'games.best': 'Cao nhất {n} · {plays} lượt',
+  'game.true-size.name': 'Kích Thước Thật',
+  'game.true-size.kind': 'Xếp hình',
+  'game.true-size.desc': 'Kích thước thật, không Mercator. Bao nhiêu nước châu Âu vừa trong Brazil?',
+  'game.flag-fault.name': 'Cờ Sai',
+  'game.flag-fault.kind': 'Mắt tinh',
+  'game.flag-fault.desc': 'Một lá cờ quen thuộc bị sửa lén một chỗ. Chạm vào lỗi trước khi hết giờ.',
+  'game.border-sketch.name': 'Vẽ Biên Giới',
+  'game.border-sketch.kind': 'Trí nhớ',
+  'game.border-sketch.desc': 'Chỉ có tên nước và tờ giấy trắng. Vẽ theo trí nhớ và xem bạn giống bao nhiêu.',
+  'game.warped-map.name': 'Bản Đồ Méo', 'game.globe-cut.name': 'Nhát Cắt Địa Cầu',
+  'game.flag-painter.name': 'Tô Cờ', 'game.border-go.name': 'Cờ Vây Biên Giới', 'game.elements.name': 'Nguyên Tố',
+  'common.back': '← Tất cả trò chơi', 'common.howTo': 'Cách chơi', 'common.gotIt': 'Đã hiểu',
+  'common.playAgain': 'Chơi lại', 'common.home': 'Trang chủ', 'common.next': 'Tiếp',
+  'common.loading': 'Đang tải…', 'common.score': 'Điểm', 'common.round': 'Vòng', 'common.time': 'Thời gian',
+  'common.daily': 'Thử thách ngày',
+  'result.title': 'Chơi hay lắm', 'result.xp': '+{n} XP', 'result.levelUp': 'Lên cấp! → {n}',
+  'result.badge': 'Huy hiệu mới: {name}', 'result.stamps': '+{n} con dấu', 'result.dailyDone': 'Xong bộ hôm nay · chuỗi {n}',
+  'result.submitted': 'Đã gửi điểm lên bảng xếp hạng', 'result.offline': 'Bảng xếp hạng ngoại tuyến: tiến trình đã lưu trên máy',
+  'result.noNick': 'Đặt biệt danh để xuất hiện trên bảng xếp hạng',
+  'ts.filled': 'Đã lấp', 'ts.placed': 'Đã đặt',
+  'ts.help': 'Kéo các nước từ khay vào khung · xoay bằng Q/E, con lăn chuột hoặc nút',
+  'ts.challenge': 'Thử thách', 'ts.change': 'Đổi thử thách', 'ts.lock': 'Chốt kết quả',
+  'ts.tray': 'Khay (kéo vào khung)',
+  'ts.rule': 'Một nước được tính khi ≥ 90% nằm trong khung và không chồng lên nước khác. Sao: 30% · 45% · 58%.',
+  'ts.rules.1': 'Mỗi màn có một nước lớn làm khung và một khay các nước khác, tất cả đúng tỉ lệ (phép chiếu đồng diện tích).',
+  'ts.rules.2': 'Kéo và xoay để lấp khung nhiều nhất có thể mà không chồng nhau.',
+  'ts.rules.3': 'Nhấp đúp hoặc nhấn Delete để trả về khay. Mảnh màu đỏ là tràn ra ngoài hoặc chồng nhau.',
+  'ts.rotate': 'Xoay',
+  'ts.cTitle': '{tray} trong {frame}',
+  'ts.cDesc': '{frame} rộng {area}. Hãy xếp vào càng nhiều nước càng tốt.',
+  'ts.region.europe': 'Châu Âu', 'ts.region.asia': 'Châu Á', 'ts.region.africa': 'Châu Phi', 'ts.region.west-europe': 'Tây Âu',
+  'ff.find': 'Tìm lỗi trên lá cờ', 'ff.correct': 'Chính xác!', 'ff.timeout': 'Hết giờ: lỗi ở đây',
+  'ff.wrong': 'Không phải chỗ đó (−3s)',
+  'ff.rules.1': 'Mỗi vòng là một lá cờ quen thuộc bị thay đổi đúng một chỗ: sai màu hoặc mất một chi tiết.',
+  'ff.rules.2': 'Chạm vào chỗ bị sửa. Càng nhanh càng nhiều điểm; chạm sai mất 3 giây.',
+  'ff.rules.3': '8 lá cờ mỗi lượt, 15 giây mỗi lá.',
+  'bs.draw': 'Vẽ', 'bs.clear': 'Xoá', 'bs.submit': 'So sánh', 'bs.match': 'Giống {n}%',
+  'bs.tooSmall': 'Hãy vẽ một đường bao khép kín của cả nước trước.',
+  'bs.rules.1': 'Bạn nhận một tên nước. Vẽ đường bao bằng một nét; hình sẽ tự khép lại.',
+  'bs.rules.2': 'Kích thước và vị trí không quan trọng: hai hình được đưa về cùng diện tích trước khi so. Hướng thì có: phía bắc ở trên.',
+  'bs.rules.3': '5 nước mỗi lượt; điểm là phần trăm trùng khớp.',
+  'bs.legend': 'Đường màu cam: đường biên thật',
+  'lb.title': 'Bảng xếp hạng', 'lb.overall': 'Tổng', 'lb.all': 'Mọi lúc', 'lb.week': 'Tuần này', 'lb.day': 'Hôm nay (thử thách)',
+  'lb.rank': '#', 'lb.player': 'Người chơi', 'lb.points': 'Điểm', 'lb.empty': 'Chưa có điểm nào. Hãy là người đầu tiên!',
+  'lb.you': 'Bạn', 'lb.offline': 'Không kết nối được máy chủ bảng xếp hạng.',
+  'col.passportDesc': 'Mỗi nước bạn ghi điểm trong trò chơi sẽ được đóng dấu vào hộ chiếu.',
+  'col.badgesDesc': 'Thành tích mở khoá khi chơi.',
+  'col.stamps': 'Con dấu', 'col.level': 'Cấp', 'col.xp': 'Tổng XP', 'col.played': 'Số lượt chơi',
+  'col.reset': 'Xoá tiến trình', 'col.resetConfirm': 'Xoá toàn bộ tiến trình trên thiết bị này?',
+  'col.changeNick': 'Đổi biệt danh',
+  'facts.title': 'Có thể bạn chưa biết',
+  'footer.about': 'Trò chơi giúp nhìn Trái Đất theo cách mới qua bản đồ và lá cờ. Mỗi chiến thắng thêm một con dấu vào hộ chiếu.',
+  'footer.data': 'Dữ liệu & ghi công',
+  'footer.disclaimer': 'Số liệu tính từ bản đồ giản lược chỉ mang tính gần đúng: để chơi, không để tra cứu. Đường biên chỉ mang tính minh hoạ.',
+  'footer.privacy': 'Tiến trình được lưu trên thiết bị này. Bảng xếp hạng chỉ nhận biệt danh và điểm của bạn.',
+};
+
+const DICTS: Record<Lang, Record<DictKey, string>> = { en, vi };
+
+type Vars = Record<string, string | number>;
+interface I18nCtx {
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  /** Typed keys from the main dictionary, or any per-game key from gameText.ts. */
+  t: (key: DictKey | (string & {}), vars?: Vars) => string;
+}
+
+const Ctx = createContext<I18nCtx | null>(null);
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [lang, setLangState] = useState<Lang>('en');
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('geoplay.lang') as Lang | null;
+      if (saved && saved in DICTS) setLangState(saved);
+      else if (navigator.language?.startsWith('vi')) setLangState('vi');
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  const setLang = useCallback((l: Lang) => {
+    setLangState(l);
+    try { localStorage.setItem('geoplay.lang', l); } catch {}
+  }, []);
+
+  const t = useCallback(
+    (key: DictKey | (string & {}), vars?: Vars) => {
+      let s =
+        (DICTS[lang] as Record<string, string>)[key] ??
+        GAME_TEXT[lang][key] ??
+        (en as Record<string, string>)[key] ??
+        GAME_TEXT.en[key] ??
+        key;
+      if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, String(v));
+      return s;
+    },
+    [lang],
+  );
+
+  const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+export function useI18n() {
+  const c = useContext(Ctx);
+  if (!c) throw new Error('useI18n must be used inside I18nProvider');
+  return c;
+}

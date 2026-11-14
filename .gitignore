@@ -1,0 +1,8 @@
+node_modules
+dist
+.next
+.env
+*.log
+apps/web/public/flags
+apps/web/public/geo
+src/generated
