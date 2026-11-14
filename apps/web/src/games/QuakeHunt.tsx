@@ -7,6 +7,7 @@ import { addGameText } from '@/lib/gameText';
 import { countryName, loadWorld, type World } from '@/lib/geo';
 import { mulberry32, shuffle } from '@/lib/rng';
 import { countryAt } from '@/components/InteractiveGlobe';
+import { IslandMarks } from '@/components/IslandMarks';
 import { GameShell, type GameContext } from '@/components/GameShell';
 
 addGameText({
@@ -111,6 +112,7 @@ export function QuakeHunt({ ctx }: { ctx: GameContext }) {
             <path d={path({ type: 'Sphere' }) ?? ''} fill="#0c1430" stroke="rgba(255,255,255,0.08)" />
             <path d={path(geoGraticule10()) ?? ''} fill="none" stroke="rgba(255,255,255,0.04)" />
             {base.map((c) => <path key={c.a2} d={c.d} fill="#25335a" stroke="rgba(7,11,20,0.6)" strokeWidth={0.5} />)}
+            <IslandMarks projection={projection} fill="#3a4c80" radius={1.2} labels={false} />
             {stations.map((s, i) => {
               const deg = (s.estKm / R_KM) * (180 / Math.PI);
               // Draw rings as lines, not polygons, so circles over a pole don't get a closing edge.

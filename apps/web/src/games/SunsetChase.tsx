@@ -6,6 +6,7 @@ import { useI18n } from '@/lib/i18n';
 import { addGameText } from '@/lib/gameText';
 import { loadWorld, type World } from '@/lib/geo';
 import { mulberry32 } from '@/lib/rng';
+import { ARCHIPELAGOS } from '@/lib/islands';
 import { GameShell, type GameContext } from '@/components/GameShell';
 
 addGameText({
@@ -67,6 +68,8 @@ export function SunsetChase({ ctx }: { ctx: GameContext }) {
     b.fillStyle = '#0d1630'; b.fillRect(0, 0, W, H);
     const proj = geoEquirectangular().scale(W / (2 * Math.PI)).translate([W / 2, H / 2]);
     b.beginPath(); geoPath(proj, b)(world.land); b.fillStyle = '#2b3b63'; b.fill();
+    b.fillStyle = '#3b4f80';
+    for (const a of ARCHIPELAGOS) for (const [lon, lat] of a.points) { b.beginPath(); b.arc(x(lon), y(lat), 1.4, 0, Math.PI * 2); b.fill(); }
     b.strokeStyle = 'rgba(255,255,255,0.05)';
     for (let lon = -180; lon <= 180; lon += 30) { b.beginPath(); b.moveTo(x(lon), 0); b.lineTo(x(lon), H); b.stroke(); }
     for (let lat = -60; lat <= 60; lat += 30) { b.beginPath(); b.moveTo(0, y(lat)); b.lineTo(W, y(lat)); b.stroke(); }

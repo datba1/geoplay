@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { geoContains, geoOrthographic, geoPath, geoGraticule10 } from 'd3-geo';
 import { loadWorld } from '@/lib/geo';
+import { ARCHIPELAGOS } from '@/lib/islands';
 
 /** Rotating dotted globe drawn on canvas. Drag to spin it. */
 export function Globe({ size = 380 }: { size?: number }) {
@@ -39,6 +40,8 @@ export function Globe({ size = 380 }: { size?: number }) {
           if (geoContains(world.land, [lon, lat])) pts.push([lon, lat]);
         }
       }
+      // Island groups too small for the 1:110m land data.
+      for (const a of ARCHIPELAGOS) pts.push(...a.points);
       dots = pts;
     });
 

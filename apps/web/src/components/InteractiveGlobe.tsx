@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
 import { geoContains, geoGraticule10, geoOrthographic, geoPath, type GeoPath, type GeoProjection } from 'd3-geo';
 import type { World } from '@/lib/geo';
+import { IslandMarks } from './IslandMarks';
 
 interface Props {
   world: World;
@@ -87,6 +88,7 @@ export function InteractiveGlobe({ world, size = 560, rotation, onRotate, fill, 
       {world.countries.map((c) => (
         <path key={c.a2} d={path(c.feature) ?? ''} fill={fill(c.a2)} stroke={stroke ?? 'rgba(7,11,20,0.75)'} strokeWidth={0.6} />
       ))}
+      <IslandMarks projection={projection} fill={fill('VN')} radius={1.6} fontSize={9} />
       {overlay?.(path, projection)}
     </svg>
   );

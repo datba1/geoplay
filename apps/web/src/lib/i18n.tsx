@@ -120,6 +120,7 @@ const en = {
   'footer.data': 'Data & credits',
   'footer.disclaimer': 'Figures computed from simplified maps are approximate: made for play, not reference. Borders are illustrative.',
   'footer.privacy': 'Progress is saved on this device. The leaderboard only receives your nickname and scores.',
+  'footer.islands': 'The Paracel (Hoàng Sa) and Spratly (Trường Sa) Islands are shown as part of Vietnam.',
 };
 
 export type DictKey = keyof typeof en;
@@ -231,6 +232,7 @@ const vi: Record<DictKey, string> = {
   'footer.data': 'Dữ liệu & ghi công',
   'footer.disclaimer': 'Số liệu tính từ bản đồ giản lược chỉ mang tính gần đúng: để chơi, không để tra cứu. Đường biên chỉ mang tính minh hoạ.',
   'footer.privacy': 'Tiến trình được lưu trên thiết bị này. Bảng xếp hạng chỉ nhận biệt danh và điểm của bạn.',
+  'footer.islands': 'Quần đảo Hoàng Sa và Trường Sa là một phần của Việt Nam.',
 };
 
 const DICTS: Record<Lang, Record<DictKey, string>> = { en, vi };

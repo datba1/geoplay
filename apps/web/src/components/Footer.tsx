@@ -53,6 +53,7 @@ export function Footer() {
       <div className="container" style={{ marginTop: 24 }}>
         <p className="small">🗺 {t('footer.disclaimer')}</p>
         <p className="small">🔒 {t('footer.privacy')}</p>
+        <p className="small">🇻🇳 {t('footer.islands')}</p>
         <p className="small">© {new Date().getFullYear()} GeoPlay</p>
       </div>
     </footer>

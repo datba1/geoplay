@@ -7,6 +7,7 @@ import { api, type StatIndicator } from '@/lib/api';
 import { countryName, loadWorld, type World } from '@/lib/geo';
 import { mulberry32, shuffle } from '@/lib/rng';
 import { GameShell, type GameContext } from '@/components/GameShell';
+import { IslandMarks } from '@/components/IslandMarks';
 
 const W = 960;
 const H = 500;
@@ -94,6 +95,7 @@ export function WarpedMap({ ctx }: { ctx: GameContext }) {
     return { sphere: path({ type: 'Sphere' }) ?? '', lines: path(geoGraticule10()) ?? '' };
   }, []);
   const rounds = useMemo(() => (indicators ? makeRounds(indicators, ctx.seed) : []), [indicators, ctx.seed]);
+  const islandProjection = useMemo(() => geoEqualEarth().fitExtent([[10, 10], [W - 10, H - 10]], { type: 'Sphere' }), []);
   const current = rounds[round];
   const scales = useMemo(() => (current ? scalesFor(shapes, current.answer.values) : {}), [shapes, current]);
 
@@ -195,6 +197,7 @@ export function WarpedMap({ ctx }: { ctx: GameContext }) {
                 </path>
               );
             })}
+            <IslandMarks projection={islandProjection} fill="rgba(255,255,255,0.45)" radius={1.1} labels={false} />
           </svg>
         </div>
         <div className="timer-bar" style={{ marginTop: 10 }}>

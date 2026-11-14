@@ -6,6 +6,7 @@ import type { Feature, Polygon } from 'geojson';
 import { countryName, largestPolygon, type World } from '@/lib/geo';
 import type { Region } from '@/lib/regions';
 import { useI18n } from '@/lib/i18n';
+import { IslandMarks } from './IslandMarks';
 
 export const MAP_W = 900;
 export const MAP_H = 620;
@@ -47,7 +48,7 @@ export function useRegionGeometry(world: World, region: Region) {
 
 export function RegionMap({ world, region, codes, fill, stroke, onClick, label, edges }: Props) {
   const { lang } = useI18n();
-  const { shapes, context } = useRegionGeometry(world, region);
+  const { shapes, context, projection } = useRegionGeometry(world, region);
   return (
     <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} style={{ display: 'block', width: '100%', height: 'auto' }}>
       {context.map((c) => <path key={`ctx-${c.a2}`} d={c.d} fill="rgba(255,255,255,0.035)" stroke="rgba(255,255,255,0.05)" strokeWidth={0.5} />)}
@@ -78,6 +79,7 @@ export function RegionMap({ world, region, codes, fill, stroke, onClick, label, 
           </path>
         );
       })}
+      <IslandMarks projection={projection} fill={codes.includes('VN') ? fill('VN') : 'rgba(255,255,255,0.25)'} radius={2.2} fontSize={11} />
       {label && codes.map((a2) => {
         const s = shapes.get(a2);
         const content = label(a2);
