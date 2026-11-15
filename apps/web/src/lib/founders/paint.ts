@@ -9,7 +9,7 @@ export const PAINT: Record<Terrain, [number, number, number]> = {
   plains: [190, 186, 122],
   forest: [118, 140, 86],
   hills: [176, 158, 112],
-  mountains: [226, 222, 212], // snow-capped
+  mountains: [214, 208, 194], // pale rock with snow
   desert: [222, 200, 146],
   marsh: [132, 160, 136],
 };

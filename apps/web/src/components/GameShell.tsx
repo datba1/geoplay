@@ -148,7 +148,10 @@ export function GameShell({ slug, rules, stats, immersive, children }: Props) {
         {isDaily && <span className="chip">📅 {t('common.daily')}</span>}
         <span className="spacer" />
         {bonus.combo >= 2 && (
-          <span key={bonus.combo} className="combo-chip" title={t('depth.combo')}>⚡ ×{bonus.combo}</span>
+          <span key={bonus.combo} className="combo-chip" title={t('depth.combo')}>
+            <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden><path d="M7 0 L1 8 H5 L4 14 L11 5 H7 Z" fill="#1a1206" /></svg>
+            ×{bonus.combo}
+          </span>
         )}
         {immersive && <FullscreenButton />}
         <div className="segmented diff-picker" role="radiogroup" aria-label={t('depth.difficulty')} title={isDaily ? t('depth.dailyNormal') : undefined}>

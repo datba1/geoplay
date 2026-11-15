@@ -15,6 +15,9 @@ export type Terrain = 'plains' | 'forest' | 'hills' | 'mountains' | 'desert' | '
 export type Building = 'farm' | 'mine' | 'market' | 'temple' | 'barracks' | 'port' | 'walls';
 export type Res = 'gold' | 'food' | 'materials' | 'army';
 
+export type Landmark = 'cave' | 'tree' | 'ruins' | 'dragon' | 'shrine' | 'oasis' | 'lighthouse';
+export interface LandmarkInfo { kind: Landmark; name: string; looted: boolean }
+
 export interface Province {
   id: number;
   name: string;
@@ -27,6 +30,7 @@ export interface Province {
   owner: number | null; // 0 = player, 1.. = rivals, null = free tribes
   buildings: Building[];
   tribe: number; // defence of free tribes
+  landmark?: LandmarkInfo;
 }
 
 export interface Nation {
@@ -89,6 +93,23 @@ export const BUILDINGS: Record<Building, { cost: Partial<Record<Res, number>>; y
   barracks: { cost: { materials: 20, gold: 15 }, yields: { army: 2 } },
   port: { cost: { materials: 30 }, yields: { gold: 4, food: 1 }, needs: (p) => p.coast },
   walls: { cost: { materials: 30 }, yields: {}, defence: 6 },
+};
+
+/** What each landmark gives its owner. */
+export const LANDMARKS: Record<Landmark, {
+  fits: (p: Province) => boolean;
+  yields?: Partial<Record<Res, number>>;
+  stability?: number;
+  treasure?: { gold?: number; stability?: number };
+  tribeBonus?: number;
+}> = {
+  cave: { fits: (p) => p.terrain === 'hills' || p.terrain === 'mountains', yields: { materials: 2 } },
+  tree: { fits: (p) => p.terrain === 'forest', stability: 2 },
+  ruins: { fits: () => true, treasure: { gold: 40 }, tribeBonus: 3 },
+  dragon: { fits: (p) => p.terrain === 'mountains' || p.terrain === 'hills', treasure: { gold: 80, stability: 6 }, tribeBonus: 12 },
+  shrine: { fits: (p) => p.terrain === 'plains' || p.terrain === 'marsh', yields: { gold: 1 }, stability: 1 },
+  oasis: { fits: (p) => p.terrain === 'desert', yields: { food: 3 } },
+  lighthouse: { fits: (p) => p.coast, yields: { gold: 3 } },
 };
 
 export const RECRUIT = { cost: { gold: 15, food: 10 } as Partial<Record<Res, number>>, army: 6 };
@@ -242,7 +263,7 @@ export function generate(seed: number, difficulty: Difficulty): State {
     if (comp[i] !== best) continue;
     const e = elevation[i];
     const m = moist(pts[i][0] / MAP_W, pts[i][1] / MAP_H);
-    const terrain: Terrain = e > 0.72 ? 'mountains' : e > 0.5 ? 'hills' : m < 0.3 ? 'desert' : m > 0.68 ? (e < 0.25 ? 'marsh' : 'forest') : m > 0.52 ? 'forest' : 'plains';
+    const terrain: Terrain = e > 0.8 ? 'mountains' : e > 0.55 ? 'hills' : m < 0.3 ? 'desert' : m > 0.68 ? (e < 0.25 ? 'marsh' : 'forest') : m > 0.52 ? 'forest' : 'plains';
     const poly = (vor.cellPolygon(i) ?? []).map(([x, y]) => [Math.round(x * 10) / 10, Math.round(y * 10) / 10] as [number, number]);
     ids.set(i, provinces.length);
     provinces.push({
@@ -259,6 +280,27 @@ export function generate(seed: number, difficulty: Difficulty): State {
     // Cells touching the map edge also face the sea.
     if (p.poly.some(([x, y]) => x <= 0.5 || y <= 0.5 || x >= MAP_W - 0.5 || y >= MAP_H - 0.5)) p.coast = true;
   }
+
+  // Landmarks: one dragon, then a scattering of the rest (about one province in nine).
+  const order = shuffle(provinces, rand);
+  const place = (kind: Landmark, count: number) => {
+    for (const p of order) {
+      if (count <= 0) break;
+      if (p.landmark || !LANDMARKS[kind].fits(p)) continue;
+      if (p.neighbors.some((n) => provinces[n].landmark)) continue; // keep them spread out
+      p.landmark = { kind, name: makeName(rand, used), looted: false };
+      p.tribe += LANDMARKS[kind].tribeBonus ?? 0;
+      count--;
+    }
+  };
+  const share = Math.max(1, Math.round(provinces.length / 50));
+  place('dragon', 1);
+  place('ruins', share * 2);
+  place('cave', share * 2);
+  place('tree', share * 2);
+  place('shrine', share);
+  place('oasis', share);
+  place('lighthouse', share);
 
   const d = DIFF[difficulty];
   const nations: Nation[] = [];
@@ -337,6 +379,7 @@ export function claim(prev: State, pid: number): ActionResult {
   me.army -= Math.ceil(p.tribe / 2);
   p.owner = 0;
   say(s, 'good', `${p.name} joins the realm.`, `${p.name} sáp nhập vào vương quốc.`);
+  lootLandmark(s, p, me);
   return { state: s, ok: true };
 }
 
@@ -451,6 +494,20 @@ export function attack(prev: State, pid: number): ActionResult {
   return { state: s, ok: false, reason: 'lost' };
 }
 
+/** One-time treasure from ruins and dragon hoards. */
+function lootLandmark(s: State, p: Province, n: Nation) {
+  const lm = p.landmark;
+  if (!lm || lm.looted) return;
+  const t = LANDMARKS[lm.kind].treasure;
+  if (!t) return;
+  lm.looted = true;
+  if (t.gold) n.gold += t.gold;
+  if (t.stability) n.stability = clamp(n.stability + t.stability, 0, 100);
+  if (n.id !== 0) return;
+  if (lm.kind === 'dragon') say(s, 'good', `The dragon of ${lm.name} is driven off. Its hoard fills our treasury (+${t.gold} gold).`, `Rồng ở ${lm.name} bị đánh đuổi. Kho báu của nó làm đầy ngân khố (+${t.gold} vàng).`);
+  else say(s, 'good', `Explorers search the ruins of ${lm.name} and find treasure (+${t.gold} gold).`, `Đoàn thám hiểm lục soát phế tích ${lm.name} và tìm được kho báu (+${t.gold} vàng).`);
+}
+
 function relocateCapital(s: State, n: Nation) {
   const rest = owned(s, n.id);
   if (!rest.length) {
@@ -517,6 +574,11 @@ export function income(s: State, nid: number) {
       for (const [k, v] of Object.entries(BUILDINGS[b].yields)) out[k as Res] += v ?? 0;
       stab += BUILDINGS[b].stability ?? 0;
     }
+    if (p.landmark) {
+      const lm = LANDMARKS[p.landmark.kind];
+      for (const [k, v] of Object.entries(lm.yields ?? {})) out[k as Res] += v ?? 0;
+      stab += lm.stability ?? 0;
+    }
   }
   const n = s.nations[nid];
   // The capital's palace and markets.
@@ -572,6 +634,17 @@ export function endSeason(prev: State): State {
     }
   }
 
+  // A free dragon raids the realm next door.
+  for (const lair of s.provinces.filter((p) => p.landmark?.kind === 'dragon' && p.owner === null)) {
+    const prey = lair.neighbors.map((n) => s.provinces[n]).filter((p) => p.owner === 0);
+    if (prey.length && roll(s) < 0.3) {
+      const hit = prey[Math.floor(roll(s) * prey.length)];
+      me.food = Math.max(0, me.food - 10);
+      me.stability = clamp(me.stability - 3, 0, 100);
+      say(s, 'bad', `The dragon of ${lair.landmark!.name} burns the fields of ${hit.name}.`, `Rồng ở ${lair.landmark!.name} thiêu rụi ruộng đồng ở ${hit.name}.`);
+    }
+  }
+
   // Rivals.
   for (const r of s.nations.slice(1)) {
     if (!r.alive) continue;
@@ -585,6 +658,7 @@ export function endSeason(prev: State): State {
       if (r.army >= target.tribe) {
         r.army -= Math.ceil(target.tribe / 2);
         target.owner = r.id;
+        lootLandmark(s, target, r);
       }
     }
     // Relations drift: borders breed friction, pacts build trust.

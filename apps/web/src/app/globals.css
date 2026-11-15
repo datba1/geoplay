@@ -848,3 +848,72 @@ html.immersive-lock, html.immersive-lock body { overflow: hidden; }
   .game-immersive .fo-map { height: 62vh; }
   .game-immersive .fo-side { height: auto; border-left: 0; border-top: 1px solid var(--line); }
 }
+
+/* Founders landmarks */
+.lm path, .lm ellipse { fill: none; stroke: #3b2a17; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.lm .lm-disc { fill: rgba(246,238,214,0.92); stroke: #5a4428; stroke-width: 1.4; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35)); }
+.lm .lm-fill { fill: #8d7a5c; }
+.lm .lm-dark { fill: #2d2116; stroke: none; }
+.lm .lm-green { fill: #5f8a4c; stroke: #2f4a24; stroke-width: 1.1; }
+.lm .lm-thick { stroke-width: 2.4; }
+.lm .lm-thin { stroke-width: 1; }
+.lm .lm-red { fill: #b33a2a; stroke: #5e1a12; stroke-width: 1.1; }
+.lm .lm-eye { fill: #f5d27a; stroke: none; }
+.lm .lm-water { fill: #6fa3a6; stroke: #3b6e70; stroke-width: 1; }
+.lm .lm-light { fill: #f5d27a; }
+.lm-dragon .lm-disc { fill: #f3dfd0; stroke: #8e2a1c; stroke-width: 2; }
+.lm.looted { opacity: 0.55; }
+.fo-landmark { display: grid; gap: 2px; margin-top: 8px; padding: 9px 11px; border-radius: 10px; border: 1px solid rgba(245,210,122,0.3); background: rgba(245,210,122,0.07); }
+.fo-landmark b { font: 600 15px var(--font-display); color: #f5d27a; }
+.lm-card-dragon { border-color: rgba(220,80,60,0.45); background: rgba(220,80,60,0.08); }
+.lm-card-dragon b { color: #ff9c86; }
+
+/* ================= Founders: medieval manuscript style ================= */
+.fo { --medieval: 'EB Garamond', 'Fraunces', Georgia, serif; }
+.mv path, .mv ellipse { stroke: #3a2814; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.mv .mv-halo { fill: rgba(240,228,196,0.55); stroke: none; filter: blur(4px); }
+.mv .mv-rock { fill: #a8957a; }
+.mv .mv-stone { fill: #c9b896; }
+.mv .mv-void { fill: #2a1d10; }
+.mv .mv-hatch { fill: none; stroke-width: 0.9; opacity: 0.7; }
+.mv .mv-trunk { fill: none; stroke: #4a3418; stroke-width: 2; }
+.mv .mv-leaf { fill: #6e8d4f; }
+.mv .mv-arch { fill: none; stroke-width: 2.2; }
+.mv .mv-ground { fill: none; stroke-width: 1.1; opacity: 0.6; }
+.mv .mv-roof { fill: #9a4b32; }
+.mv .mv-ink { fill: none; }
+.mv .mv-water { fill: #7fa9a6; stroke: #3d6a68; }
+.mv .mv-palm { fill: none; stroke: #4e6b33; stroke-width: 2; }
+.mv .mv-flame { fill: #f2b544; stroke: #a0521a; }
+.mv .mv-gold { fill: none; stroke: #d9a53a; stroke-width: 2.4; }
+.mv .mv-dragon-body { fill: none; stroke: #6e1f15; stroke-width: 3.4; }
+.mv .mv-dragon-wing { fill: #b4402c; stroke: #5a1810; stroke-width: 1.2; }
+.mv .mv-hull { fill: #7a5530; }
+.mv .mv-sail { fill: #efe3c6; }
+.mv .mv-wave { fill: none; stroke: #4e7f80; stroke-width: 1.2; opacity: 0.8; }
+.mv .mv-serpent { fill: none; stroke: #3f6f5a; stroke-width: 4; }
+.mv.looted { opacity: 0.5; }
+.mv-sea { opacity: 0.85; }
+/* old-style map lettering */
+.fm-name { font-family: var(--medieval); font-weight: 500; font-style: normal; fill: #2e1f0f; stroke: rgba(240,230,205,0.85); letter-spacing: 0.02em; }
+.fm-capital { font-family: var(--medieval); font-weight: 700; font-variant: small-caps; letter-spacing: 0.08em; text-transform: none; font-style: normal; }
+.fm-compass text { font-family: var(--medieval); }
+/* leather-and-gold panel */
+.game-immersive .fo-side {
+  background: linear-gradient(180deg, #1c140d, #120c07); border-left: 2px solid #6b5230;
+  box-shadow: inset 1px 0 0 rgba(245,210,122,0.15);
+}
+.fo-realm-head b, .fo-prov-info h3, .fo-landmark b, .fo-pane h4, .fo-petition p, .fo-float-season b { font-family: var(--medieval); }
+.fo-realm-head b { font-size: 25px; letter-spacing: 0.02em; }
+.fo-prov-info h3 { font-size: 24px; }
+.fo-pane h4 { font-size: 15px; color: #d9b66a; letter-spacing: 0.04em; }
+.fo-petition { background: linear-gradient(180deg, rgba(236,220,182,0.08), rgba(236,220,182,0.03)); border-color: rgba(201,160,90,0.4); }
+.fo-petition p { font-size: 16.5px; color: #f1e4c4; }
+.fo-tile, .fo-choice, .fo-nation, .fo-war { border-color: rgba(201,160,90,0.28); }
+.fo-tile { background: rgba(236,220,182,0.04); }
+.fo-tabs { background: rgba(236,220,182,0.05); border: 1px solid rgba(201,160,90,0.25); }
+.fo-tabs button { font-family: var(--medieval); font-size: 14.5px; font-weight: 700; }
+.game-immersive > .game-top { background: linear-gradient(180deg, #1a120b, #120c07); border-bottom: 2px solid #6b5230; }
+.game-immersive > .game-top h1 { font-family: var(--medieval); font-weight: 700; font-style: normal; color: #f0d58f; letter-spacing: 0.02em; }
+
+.combo-chip { gap: 3px; }

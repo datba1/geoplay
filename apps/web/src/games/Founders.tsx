@@ -6,7 +6,7 @@ import { addGameText } from '@/lib/gameText';
 import { GameShell, type GameContext } from '@/components/GameShell';
 import { FoundersMap } from '@/components/FoundersMap';
 import {
-  BUILDINGS, GIFT_GOLD, PEACE_GOLD, RECRUIT, SEASONS, SEASON_NAMES, YIELD,
+  BUILDINGS, GIFT_GOLD, LANDMARKS, PEACE_GOLD, RECRUIT, SEASONS, SEASON_NAMES, YIELD,
   answer, attack, build, buildSlots, canAfford, claim, claimCost, declareWar, defenceOf, endSeason, found, generate,
   gift, income, makePeace, maxMandate, owned, player, proposePact, recruit, scoreOf,
   type ActionResult, type Building, type FlagSpec, type Province, type Res, type State,
@@ -34,6 +34,12 @@ addGameText({
     'fo.err.refused': 'They refused.', 'fo.err.lost': 'The attack failed.', 'fo.income': 'per season', 'fo.result': '{p} provinces · {b} buildings',
     'fo.lost': 'The capital fell', 'fo.b.farm': 'Farm', 'fo.b.mine': 'Mine', 'fo.b.market': 'Market', 'fo.b.temple': 'Temple',
     'fo.b.barracks': 'Barracks', 'fo.b.port': 'Port', 'fo.b.walls': 'Walls', 'fo.walls': '+6 defence', 'fo.temple': '+3 stability',
+    'fo.lm.cave': 'Cave of {n}', 'fo.lm.tree': 'Elder tree of {n}', 'fo.lm.ruins': 'Ruins of {n}', 'fo.lm.dragon': 'Dragon’s lair of {n}',
+    'fo.lm.shrine': 'Shrine of {n}', 'fo.lm.oasis': 'Oasis of {n}', 'fo.lm.lighthouse': 'Lighthouse of {n}',
+    'fo.lmFx.cave': '+2 materials each season once it is yours.', 'fo.lmFx.tree': '+2 stability each season once it is yours.',
+    'fo.lmFx.ruins': 'Claim it to search the ruins: +40 gold, once.', 'fo.lmFx.dragon': 'A dragon guards a hoard (+80 gold, +6 stability) and raids its neighbours until driven off.',
+    'fo.lmFx.shrine': '+1 gold and +1 stability each season.', 'fo.lmFx.oasis': '+3 food each season.', 'fo.lmFx.lighthouse': '+3 gold each season from passing ships.',
+    'fo.lmLooted': 'Already searched: nothing left to find.',
     'fo.t.plains': 'Plains', 'fo.t.forest': 'Forest', 'fo.t.hills': 'Hills', 'fo.t.mountains': 'Mountains', 'fo.t.desert': 'Desert', 'fo.t.marsh': 'Marsh',
   },
   vi: {
@@ -56,6 +62,12 @@ addGameText({
     'fo.err.refused': 'Họ từ chối.', 'fo.err.lost': 'Cuộc tấn công thất bại.', 'fo.income': 'mỗi mùa', 'fo.result': '{p} vùng · {b} công trình',
     'fo.lost': 'Kinh đô thất thủ', 'fo.b.farm': 'Nông trại', 'fo.b.mine': 'Mỏ', 'fo.b.market': 'Chợ', 'fo.b.temple': 'Đền',
     'fo.b.barracks': 'Trại lính', 'fo.b.port': 'Cảng', 'fo.b.walls': 'Thành lũy', 'fo.walls': '+6 phòng thủ', 'fo.temple': '+3 ổn định',
+    'fo.lm.cave': 'Hang {n}', 'fo.lm.tree': 'Cây cổ thụ {n}', 'fo.lm.ruins': 'Phế tích {n}', 'fo.lm.dragon': 'Hang rồng {n}',
+    'fo.lm.shrine': 'Miếu {n}', 'fo.lm.oasis': 'Ốc đảo {n}', 'fo.lm.lighthouse': 'Hải đăng {n}',
+    'fo.lmFx.cave': '+2 vật liệu mỗi mùa khi thuộc về bạn.', 'fo.lmFx.tree': '+2 ổn định mỗi mùa khi thuộc về bạn.',
+    'fo.lmFx.ruins': 'Sáp nhập để lục soát phế tích: +40 vàng, một lần.', 'fo.lmFx.dragon': 'Rồng canh giữ kho báu (+80 vàng, +6 ổn định) và đốt phá vùng lân cận cho tới khi bị đánh đuổi.',
+    'fo.lmFx.shrine': '+1 vàng và +1 ổn định mỗi mùa.', 'fo.lmFx.oasis': '+3 lương thực mỗi mùa.', 'fo.lmFx.lighthouse': '+3 vàng mỗi mùa nhờ tàu thuyền qua lại.',
+    'fo.lmLooted': 'Đã lục soát: không còn gì.',
     'fo.t.plains': 'Đồng bằng', 'fo.t.forest': 'Rừng', 'fo.t.hills': 'Đồi', 'fo.t.mountains': 'Núi', 'fo.t.desert': 'Sa mạc', 'fo.t.marsh': 'Đầm lầy',
   },
 });
@@ -360,6 +372,12 @@ function ProvinceInfo({ s, p }: { s: State; p: Province }) {
       </p>
       <div className="small"><span className="muted">{t('fo.yields')}:</span> <EffectChips e={{ ...YIELD[p.terrain], gold: (YIELD[p.terrain].gold ?? 0) + (p.coast ? 1 : 0) || undefined }} /></div>
       <div className="small"><span className="muted">{t('fo.defence', { n: defenceOf(s, p) })}</span></div>
+      {p.landmark && (
+        <div className={`fo-landmark lm-card-${p.landmark.kind}`}>
+          <b>{t(`fo.lm.${p.landmark.kind}`, { n: p.landmark.name })}</b>
+          <span className="small">{p.landmark.looted && LANDMARKS[p.landmark.kind].treasure ? t('fo.lmLooted') : t(`fo.lmFx.${p.landmark.kind}`)}</span>
+        </div>
+      )}
     </div>
   );
 }

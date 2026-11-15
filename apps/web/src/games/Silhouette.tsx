@@ -6,6 +6,7 @@ import { useI18n } from '@/lib/i18n';
 import { addGameText } from '@/lib/gameText';
 import { countryName, flagUrl, loadWorld, type World } from '@/lib/geo';
 import { PASSPORT_COUNTRIES } from '@/lib/continents';
+import { ARCHIPELAGOS } from '@/lib/islands';
 import { mulberry32, shuffle } from '@/lib/rng';
 import { GameShell, type GameContext } from '@/components/GameShell';
 
@@ -53,11 +54,19 @@ export function Silhouette({ ctx }: { ctx: GameContext }) {
 
   const r = rounds[idx];
 
+  // The country's outline plus any island groups that belong to it (e.g. Hoàng Sa and Trường Sa for Vietnam).
   const shape = useMemo(() => {
-    if (!world || !r) return '';
+    if (!world || !r) return { d: '', dots: [] as [number, number][] };
     const c = world.byA2.get(r.answer)!;
-    const proj = geoAzimuthalEqualArea().rotate([-c.centroid[0], -c.centroid[1]]).fitExtent([[20, 20], [280, 280]], c.feature);
-    return geoPath(proj)(c.feature) ?? '';
+    const islands = ARCHIPELAGOS.filter((a) => a.owner === r.answer).flatMap((a) => a.points);
+    const fitTo = islands.length
+      ? { type: 'FeatureCollection' as const, features: [c.feature, { type: 'Feature' as const, properties: {}, geometry: { type: 'MultiPoint' as const, coordinates: islands } }] }
+      : c.feature;
+    const proj = geoAzimuthalEqualArea().rotate([-c.centroid[0], -c.centroid[1]]).fitExtent([[20, 20], [280, 280]], fitTo as never);
+    return {
+      d: geoPath(proj)(c.feature) ?? '',
+      dots: islands.map((pt) => proj(pt)).filter((q): q is [number, number] => !!q),
+    };
   }, [world, r]);
 
   useEffect(() => {
@@ -117,7 +126,10 @@ export function Silhouette({ ctx }: { ctx: GameContext }) {
         <div className="silhouette-stage">
           <svg viewBox="0 0 300 300" aria-label={t('si.which')}>
             <g transform={`rotate(${picked ? 0 : r.turn} 150 150)`} style={{ transition: 'transform 0.6s ease' }}>
-              <path d={shape} fill={picked ? (picked === r.answer ? '#4fd1a1' : '#ff7a8a') : '#e9e2cf'} stroke="#0b1020" strokeWidth={1} />
+              <path d={shape.d} fill={picked ? (picked === r.answer ? '#4fd1a1' : '#ff7a8a') : '#e9e2cf'} stroke="#0b1020" strokeWidth={1} />
+              {shape.dots.map(([x, y], i) => (
+                <circle key={i} cx={x} cy={y} r={2.6} fill={picked ? (picked === r.answer ? '#4fd1a1' : '#ff7a8a') : '#e9e2cf'} stroke="#0b1020" strokeWidth={0.6} />
+              ))}
             </g>
           </svg>
         </div>
