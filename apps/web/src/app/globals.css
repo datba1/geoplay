@@ -679,3 +679,78 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
   .versus .vs { right: -21px; width: 30px; height: 30px; }
   .city-options { grid-template-columns: 1fr !important; }
 }
+
+/* ================= Founders ================= */
+.fo { display: grid; gap: 12px; }
+.fo-bar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 10px; border-radius: 14px;
+  border: 1px solid var(--line); background: var(--panel);
+}
+.fo-season { display: flex; flex-direction: column; white-space: nowrap; line-height: 1.15; padding-right: 8px; margin-right: 2px; border-right: 1px solid var(--line); font-size: 14px; }
+.fo-season b { font: 600 18px var(--font-display); color: var(--gold); }
+.fo-season small { color: var(--muted); font-size: 11px; }
+.fo-res { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 10px; background: rgba(255,255,255,0.04); font-size: 14px; }
+.fo-res b { font-variant-numeric: tabular-nums; }
+.fo-res small { font-size: 11px; font-variant-numeric: tabular-nums; }
+.fo-res small.up, .fo-effects .up { color: var(--green); }
+.fo-res small.down, .fo-effects .down { color: var(--red); }
+.fo-stab-bar { width: 54px; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.08); overflow: hidden; }
+.fo-stab-bar span { display: block; height: 100%; background: linear-gradient(90deg, #9f87e8, #c9b6ff); }
+.fo-main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; align-items: start; }
+.fo-map { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--line-2); box-shadow: 0 18px 40px rgba(0,0,0,0.35); }
+.fo-map svg { display: block; width: 100%; height: auto; }
+.fo-prov { cursor: pointer; }
+.fo-prov:hover path:first-child { filter: brightness(1.15); }
+.fo-name { font: 600 10.5px var(--font-body, system-ui); fill: #f6efe0; paint-order: stroke; stroke: rgba(20,18,12,0.75); stroke-width: 3px; pointer-events: none; letter-spacing: 0.02em; }
+.fo-found {
+  position: absolute; left: 50%; top: 16px; transform: translateX(-50%); width: min(92%, 460px); text-align: center;
+  padding: 14px 16px; border-radius: 14px; background: rgba(9,13,26,0.86); border: 1px solid var(--line-2); backdrop-filter: blur(6px);
+}
+.fo-found h3 { margin: 0 0 4px; font: 600 20px var(--font-display); }
+.fo-found p { margin: 0 0 10px; }
+.fo-toast {
+  position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); padding: 8px 14px; border-radius: 10px;
+  background: rgba(30,10,14,0.92); border: 1px solid rgba(255,93,108,0.5); color: #ffd6db; font-size: 13px; font-weight: 600;
+}
+.fo-side { display: grid; gap: 10px; padding: 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); max-height: 760px; overflow: auto; }
+.fo-realm-head { display: flex; align-items: center; gap: 12px; }
+.fo-realm-head b { display: block; font: 600 22px var(--font-display); color: #f0cf72; }
+.fo-flag { border-radius: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.35); flex: none; }
+.fo-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background: rgba(255,255,255,0.04); }
+.fo-tabs button { position: relative; padding: 7px 4px; border-radius: 9px; border: 0; background: none; color: var(--muted); font-weight: 600; font-size: 12.5px; cursor: pointer; }
+.fo-tabs button.on { background: rgba(240,207,114,0.14); color: #f0cf72; }
+.fo-dot { position: absolute; top: 2px; right: 4px; min-width: 16px; height: 16px; border-radius: 99px; background: var(--red); color: #fff; font-size: 10px; line-height: 16px; }
+.fo-pane { display: grid; gap: 8px; }
+.fo-pane h4 { margin: 8px 0 0; font-size: 13px; color: var(--muted); font-weight: 600; }
+.fo-petition { padding: 12px; border-radius: 12px; border: 1px solid rgba(240,207,114,0.25); background: rgba(240,207,114,0.05); }
+.fo-petition p { margin: 0 0 10px; font: 500 15px/1.4 var(--font-display); }
+.fo-choice {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 9px 11px; margin-top: 6px;
+  border-radius: 10px; border: 1px solid var(--line-2); background: rgba(255,255,255,0.03); color: var(--text); font-weight: 600; text-align: left; cursor: pointer;
+}
+.fo-choice:hover:not(:disabled) { border-color: #f0cf72; }
+.fo-choice:disabled { opacity: 0.5; cursor: not-allowed; }
+.fo-effects, .fo-cost { display: inline-flex; flex-wrap: wrap; gap: 6px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fo-effects > span, .fo-cost > span { display: inline-flex; align-items: center; gap: 2px; }
+.fo-cost { color: var(--muted); }
+.fo-build-meta { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.fo-log { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; font-size: 13px; }
+.fo-log li { padding-left: 10px; border-left: 2px solid var(--line-2); }
+.fo-log li.good { border-color: var(--green); } .fo-log li.bad { border-color: var(--red); }
+.fo-log small { color: var(--muted); margin-right: 4px; }
+.fo-prov-info h3 { margin: 0; font: 600 22px var(--font-display); }
+.fo-prov-info p { margin: 2px 0 6px; }
+.fo-built { display: flex; flex-wrap: wrap; gap: 6px; }
+.fo-big { display: flex; align-items: center; gap: 8px; font-size: 26px; }
+.fo-war, .fo-nation { padding: 10px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,0.02); }
+.fo-nation.dead { opacity: 0.5; }
+.fo-rel { position: relative; height: 6px; margin: 10px 0 8px; border-radius: 99px; background: rgba(255,255,255,0.07); }
+.fo-rel::after { content: ''; position: absolute; left: 50%; top: -2px; width: 1px; height: 10px; background: var(--line-2); }
+.fo-rel span { position: absolute; top: 0; height: 100%; border-radius: 99px; }
+.fo-diplo-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.fo-danger { border-color: rgba(255,93,108,0.45) !important; color: #ffb3bc !important; }
+.fo-war-chip { border-color: rgba(255,93,108,0.5); color: #ffb3bc; }
+@media (max-width: 960px) {
+  .fo-main { grid-template-columns: 1fr; }
+  .fo-side { max-height: none; }
+}

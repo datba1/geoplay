@@ -31,6 +31,7 @@ export const GAMES: GameMeta[] = [
   { slug: 'flag-mashup', no: '11', category: 'flags', icon: '🧵', accent: '#93c5fd', difficulty: 2, minutes: 3, maxPoints: 1000, implemented: true },
   { slug: 'higher-lower', no: '19', category: 'data', icon: '📊', accent: '#60a5fa', difficulty: 1, minutes: 3, maxPoints: 1000, implemented: true, needsStats: true },
   { slug: 'north-south', no: '20', category: 'data', icon: '🧭', accent: '#4fd1a1', difficulty: 2, minutes: 3, maxPoints: 1000, implemented: true },
+  { slug: 'founders', no: '21', category: 'strategy', icon: '🏰', accent: '#e0b84a', difficulty: 3, minutes: 12, maxPoints: 1000, implemented: true },
   { slug: 'border-chess', no: '12', category: 'strategy', icon: '♞', accent: '#f5c66b', difficulty: 3, minutes: 8, maxPoints: 1000, implemented: true },
   { slug: 'border-go', no: '13', category: 'strategy', icon: '⚫', accent: '#e2e8f0', difficulty: 3, minutes: 8, maxPoints: 1000, implemented: true },
   { slug: 'diplomacy', no: '14', category: 'strategy', icon: '🃏', accent: '#86efac', difficulty: 2, minutes: 6, maxPoints: 1000, implemented: true },

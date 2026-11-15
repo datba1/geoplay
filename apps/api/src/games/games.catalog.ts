@@ -30,6 +30,7 @@ export const GAMES: GameInfo[] = [
   { slug: 'silhouette', category: 'maps', kind: 'shapes', maxPoints: 1000, implemented: true },
   { slug: 'higher-lower', category: 'data', kind: 'data', maxPoints: 1000, implemented: true },
   { slug: 'north-south', category: 'data', kind: 'capitals', maxPoints: 1000, implemented: true },
+  { slug: 'founders', category: 'strategy', kind: 'kingdom', maxPoints: 1000, implemented: true },
 ];
 
 export const findGame = (slug: string) => GAMES.find((g) => g.slug === slug);

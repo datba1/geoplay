@@ -250,6 +250,19 @@ function NorthSouthArt() {
   );
 }
 
+function FoundersArt() {
+  return (
+    <svg {...common}>
+      <path d="M22 66c6-16 18-28 34-30s22-14 40-12 32 14 38 30-6 22-22 24-30 2-46 0-46 0-44-12z" opacity=".55" />
+      <path d="M58 40l14 4 6 14-12 8-14-6z" fill="currentColor" fillOpacity=".3" />
+      <path d="M78 58l16-4 10 12-14 8z" fill="currentColor" fillOpacity=".15" strokeDasharray="3 3" />
+      <path d="M66 20v24" />
+      <path d="M66 20h14l-3 4 3 4H66" fill="currentColor" fillOpacity=".55" />
+      <path d="M110 28l6 4-6 4-6-4z" opacity=".6" />
+    </svg>
+  );
+}
+
 const ARTS: Record<string, () => React.JSX.Element> = {
   'true-size': TrueSizeArt,
   'border-sketch': BorderSketchArt,
@@ -271,6 +284,7 @@ const ARTS: Record<string, () => React.JSX.Element> = {
   silhouette: SilhouetteArt,
   'higher-lower': HigherLowerArt,
   'north-south': NorthSouthArt,
+  founders: FoundersArt,
 };
 
 export function CardArt({ slug }: { slug: string }) {

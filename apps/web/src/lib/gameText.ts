@@ -221,3 +221,22 @@ addGameText({
     'ns2.rules.3': 'Mức Dễ luôn hỏi hướng bắc với các thành phố cách xa nhau. Mức Khó trộn mọi hướng với các cặp sát nút.',
   },
 });
+
+addGameText({
+  en: {
+    'game.founders.name': 'Founders', 'game.founders.kind': 'Kingdom',
+    'game.founders.desc': 'Found a capital on an uncharted continent and steer your realm through four years of harvests, petitions, rivals and wars.',
+    'game.founders.tip': 'Food first: a starving realm loses soldiers and stability. Claim plains and coasts early, walls on your borders later.',
+    'fo.rules.1': 'Pick a province for your capital. Each season you get mandate points to claim land, build, recruit and deal with rivals.',
+    'fo.rules.2': 'Answer the season’s petitions: every choice trades one resource for another. Unanswered petitions cost stability.',
+    'fo.rules.3': 'After 16 seasons your score counts land, buildings, stability, stores and army. Lose the capital and the run ends early.',
+  },
+  vi: {
+    'game.founders.name': 'Dựng Nước', 'game.founders.kind': 'Vương quốc',
+    'game.founders.desc': 'Đặt kinh đô trên một lục địa chưa có tên trên bản đồ và dẫn dắt vương quốc qua bốn năm mùa màng, tấu chương, láng giềng và chiến tranh.',
+    'game.founders.tip': 'Lương thực trước tiên: thiếu ăn thì mất quân và mất ổn định. Sớm chiếm đồng bằng và ven biển, sau đó xây thành ở biên giới.',
+    'fo.rules.1': 'Chọn một vùng làm kinh đô. Mỗi mùa bạn có điểm mệnh lệnh để sáp nhập đất, xây dựng, chiêu mộ và giao thiệp với láng giềng.',
+    'fo.rules.2': 'Phê tấu chương của mùa: mỗi lựa chọn đổi tài nguyên này lấy tài nguyên khác. Bỏ qua tấu chương sẽ mất ổn định.',
+    'fo.rules.3': 'Sau 16 mùa, điểm tính theo lãnh thổ, công trình, ổn định, kho dự trữ và quân đội. Mất kinh đô là thua sớm.',
+  },
+});

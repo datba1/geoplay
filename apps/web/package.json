@@ -12,6 +12,7 @@
     "copy-assets": "node scripts/copy-assets.mjs"
   },
   "dependencies": {
+    "d3-delaunay": "^6.0.6",
     "d3-geo": "^3.1.1",
     "flag-icons": "^7.3.2",
     "i18n-iso-countries": "^7.14.0",
@@ -22,6 +23,7 @@
     "world-atlas": "^2.0.2"
   },
   "devDependencies": {
+    "@types/d3-delaunay": "^6.0.4",
     "@types/d3-geo": "^3.1.0",
     "@types/geojson": "^7946.0.16",
     "@types/node": "^22.0.0",
