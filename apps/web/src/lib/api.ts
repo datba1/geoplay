@@ -8,9 +8,11 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  // Only send Content-Type with a body: a GET without custom headers is a "simple" request
+  // and needs no extra CORS preflight round trip.
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+    headers: init?.body ? { 'Content-Type': 'application/json', ...(init?.headers ?? {}) } : init?.headers,
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));

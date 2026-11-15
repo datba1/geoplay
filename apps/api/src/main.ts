@@ -10,7 +10,8 @@ async function bootstrap() {
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean);
-  app.enableCors({ origin: origins });
+  // maxAge: browsers remember the CORS check for a day instead of re-asking before each request.
+  app.enableCors({ origin: origins, maxAge: 86_400 });
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
   );
