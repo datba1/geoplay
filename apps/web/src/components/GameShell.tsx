@@ -78,7 +78,7 @@ export function GameShell({ slug, rules, stats, children }: Props) {
   return (
     <div className="container">
       <div className="game-top">
-        <Link href="/#games" className="btn btn-sm btn-ghost">{t('common.back')}</Link>
+        <Link href="/games" className="btn btn-sm btn-ghost">{t('common.back')}</Link>
         <h1>{t(gameName(slug))}</h1>
         {isDaily && <span className="chip">📅 {t('common.daily')}</span>}
         <span className="spacer" />

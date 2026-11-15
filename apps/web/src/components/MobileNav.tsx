@@ -10,7 +10,7 @@ export function MobileNav() {
   const pathname = usePathname();
   const items = [
     { href: '/', icon: '🏠', label: t('common.home'), active: pathname === '/' },
-    { href: '/#games', icon: '🎮', label: t('nav.games'), active: pathname.startsWith('/games') },
+    { href: '/games', icon: '🎮', label: t('nav.games'), active: pathname.startsWith('/games') },
     { href: '/collection', icon: '🛂', label: t('nav.collection'), active: pathname === '/collection' },
     { href: '/leaderboard', icon: '🏆', label: t('nav.leaderboard'), active: pathname === '/leaderboard' },
     { href: '/handbook', icon: '📖', label: t('nav.handbook'), active: pathname === '/handbook' },

@@ -14,10 +14,11 @@ export function Header() {
   const nextLang = LANGS[(LANGS.findIndex((l) => l.code === lang) + 1) % LANGS.length];
 
   const links = [
-    { href: '/#games', label: t('nav.games') },
+    { href: '/games', label: t('nav.games') },
     { href: '/collection', label: t('nav.collection') },
     { href: '/leaderboard', label: t('nav.leaderboard') },
     { href: '/handbook', label: t('nav.handbook') },
+    { href: '/facts', label: t('nav.factsShort') },
   ];
 
   return (
@@ -32,7 +33,7 @@ export function Header() {
         </Link>
         <nav className="nav">
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className={pathname === l.href ? 'active' : ''}>
+            <Link key={l.href} href={l.href} className={pathname === l.href || (l.href === '/games' && pathname.startsWith('/games')) ? 'active' : ''}>
               {l.label}
             </Link>
           ))}

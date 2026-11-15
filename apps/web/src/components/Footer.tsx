@@ -6,7 +6,7 @@ import { GAMES, gameName } from '@/lib/games';
 import { LogoMark } from './Logo';
 
 export function Footer() {
-  const { t, setLang } = useI18n();
+  const { t, lang, setLang } = useI18n();
   return (
     <footer className="footer">
       <div className="container footer-grid">
@@ -18,15 +18,18 @@ export function Footer() {
           <p>{t('footer.about')}</p>
           <div className="row" style={{ flexWrap: 'wrap' }}>
             {LANGS.map((l) => (
-              <button key={l.code} className="btn btn-sm btn-ghost" onClick={() => setLang(l.code)}>{l.label}</button>
+              <button key={l.code} className={`lang-chip ${lang === l.code ? 'on' : ''}`} onClick={() => setLang(l.code)}>
+                <img src={`/flags/4x3/${l.flag}.svg`} alt="" width={18} />{l.label}
+              </button>
             ))}
           </div>
         </div>
         <div>
           <h4>{t('nav.games')}</h4>
-          <ul>
+          <ul className="footer-games">
+            <li><Link href="/games"><b>{t('gp.all')} →</b></Link></li>
             {GAMES.filter((g) => g.implemented).map((g) => (
-              <li key={g.slug}><Link href={`/games/${g.slug}`}>{t(gameName(g.slug))}</Link></li>
+              <li key={g.slug}><Link href={`/games/${g.slug}`}><i className="dot" style={{ background: g.accent }} />{t(gameName(g.slug))}</Link></li>
             ))}
           </ul>
         </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api, cacheKeys, type Fact } from '@/lib/api';
 import { TTL, useCached } from '@/lib/cache';
+import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
 
 const CATEGORY_ICON: Record<string, string> = {
@@ -57,7 +58,11 @@ export function FactCard() {
 
   return (
     <div>
-      <div className="section-label">{t('fact.eyebrow')}</div>
+      <div className="row section-label-row">
+        <div className="section-label" style={{ margin: 0 }}>💡 {t('fact.todayCard')}</div>
+        <span className="spacer" />
+        <Link href="/facts" className="small" style={{ textDecoration: 'underline' }}>{t('fact.all')}</Link>
+      </div>
       <FactFlip fact={fact} />
       <div className="row" style={{ marginTop: 10 }}>
         <button className="btn btn-sm" onClick={() => setIndex((shown - 1 + facts.length) % facts.length)}>‹</button>

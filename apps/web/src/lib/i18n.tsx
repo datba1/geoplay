@@ -11,6 +11,17 @@ export const LANGS: { code: Lang; label: string; flag: string }[] = [
 ];
 
 const en = {
+  'hero.playNow': 'Play now', 'hero.newHere': 'New here? Read the handbook',
+  'nav.factsShort': 'Geo facts', 'fact.todayCard': 'Today’s card',
+  'diff.1': 'Easy', 'diff.2': 'Medium', 'diff.3': 'Hard', 'games.minutes': '{n} min',
+  'gp.title': 'Choose a game', 'gp.lead': 'Maps, flags, strategy and nature. A few minutes per round, and every win stamps your passport.',
+  'gp.start': 'New here? Try', 'gp.all': 'All games', 'gp.anyDiff': 'Any difficulty',
+  'gp.len.any': 'Any length', 'gp.len.short': '≤ 3 min', 'gp.len.mid': '4–6 min', 'gp.len.long': '7 min +',
+  'gp.none': 'No game matches these filters.', 'gp.reset': 'Clear filters',
+  'ex.title': 'Explore GeoPlay', 'ex.games': 'Choose a game', 'ex.gamesDesc': '{n} games about maps, flags, strategy and nature. Filter by difficulty and length.',
+  'ex.collection': 'Passport, badges, items', 'ex.collectionDesc': '{s}/{st} stamps · {b}/{bt} badges',
+  'ex.handbook': 'The handbook', 'ex.handbookDesc': 'Where to start, how hard each game is, and why maps “lie”.',
+  'ex.facts': 'Did you know?', 'ex.factsDesc': 'Flip cards with surprising facts about the world.',
   'game.warped-map.kind': 'Quiz',
   'game.warped-map.desc': 'The world swells and shrinks by a mystery statistic. Read the shapes and guess what it is.',
   'wm.question': 'What is the map showing?',
@@ -130,6 +141,17 @@ const en = {
 export type DictKey = keyof typeof en;
 
 const vi: Record<DictKey, string> = {
+  'hero.playNow': 'Chơi ngay', 'hero.newHere': 'Mới đến? Đọc cẩm nang',
+  'nav.factsShort': 'Kiến thức', 'fact.todayCard': 'Thẻ hôm nay',
+  'diff.1': 'Dễ', 'diff.2': 'Vừa', 'diff.3': 'Khó', 'games.minutes': '{n} phút',
+  'gp.title': 'Chọn trò chơi', 'gp.lead': 'Bản đồ, lá cờ, chiến thuật và thiên nhiên. Mỗi vòng vài phút, mỗi chiến thắng thêm một con dấu vào hộ chiếu.',
+  'gp.start': 'Mới đến? Thử', 'gp.all': 'Tất cả trò chơi', 'gp.anyDiff': 'Mọi độ khó',
+  'gp.len.any': 'Mọi thời lượng', 'gp.len.short': '≤ 3 phút', 'gp.len.mid': '4–6 phút', 'gp.len.long': '7 phút +',
+  'gp.none': 'Không có trò chơi nào khớp bộ lọc.', 'gp.reset': 'Xoá bộ lọc',
+  'ex.title': 'Khám phá GeoPlay', 'ex.games': 'Chọn trò chơi', 'ex.gamesDesc': '{n} trò chơi về bản đồ, lá cờ, chiến thuật và thiên nhiên. Lọc theo độ khó và thời lượng.',
+  'ex.collection': 'Hộ chiếu, huy hiệu, vật phẩm', 'ex.collectionDesc': '{s}/{st} con dấu · {b}/{bt} huy hiệu',
+  'ex.handbook': 'Cẩm nang', 'ex.handbookDesc': 'Bắt đầu từ đâu, mỗi trò khó cỡ nào, và vì sao bản đồ “nói dối”.',
+  'ex.facts': 'Có thể bạn chưa biết', 'ex.factsDesc': 'Thẻ lật với những sự thật bất ngờ về thế giới.',
   'game.warped-map.kind': 'Đố vui',
   'game.warped-map.desc': 'Thế giới phình ra rồi co lại theo một chỉ số bí ẩn. Đọc hình dạng và đoán xem đó là gì.',
   'wm.question': 'Bản đồ đang thể hiện điều gì?',

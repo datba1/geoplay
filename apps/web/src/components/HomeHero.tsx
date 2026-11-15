@@ -22,7 +22,10 @@ export function HomeHero() {
         <p className="lead">{t('hero.lead')}</p>
         <div className="xpbar"><div style={{ width: `${(info.into / info.need) * 100}%` }} /></div>
         <p className="small muted">{t('hero.xp', { xp: info.into, need: info.need, next: info.level + 1 })}</p>
-        <Link href="#daily" className="btn btn-primary">{t('hero.play')} →</Link>
+        <div className="row hero-cta">
+          <Link href="/games" className="btn btn-primary">▶ {t('hero.playNow')}</Link>
+          <Link href="/handbook" className="btn">📖 {t('hero.newHere')}</Link>
+        </div>
       </div>
       <Globe />
     </section>

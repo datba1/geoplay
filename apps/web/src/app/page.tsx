@@ -1,10 +1,9 @@
 import { HomeHero } from '@/components/HomeHero';
 import { DailyChallenge } from '@/components/DailyChallenge';
 import { FactCard } from '@/components/FactCard';
-import { HandbookCard } from '@/components/HandbookCard';
-import { CollectionSummary } from '@/components/CollectionSummary';
-import { GameGrid } from '@/components/GameGrid';
+import { ExploreTiles } from '@/components/ExploreTiles';
 
+/** Home is a hub: hero, today's challenge, card of the day, and entry tiles. */
 export default function HomePage() {
   return (
     <div className="container">
@@ -12,12 +11,10 @@ export default function HomePage() {
       <section className="section" id="daily">
         <DailyChallenge />
       </section>
-      <section className="discover">
+      <section className="section">
         <FactCard />
-        <HandbookCard />
       </section>
-      <CollectionSummary />
-      <GameGrid />
+      <ExploreTiles />
     </div>
   );
 }

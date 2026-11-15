@@ -4,49 +4,63 @@ import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress';
-import { GAMES, gameName } from '@/lib/games';
+import { GAMES, gameName, type GameCategory, type GameMeta } from '@/lib/games';
 import { CardArt } from './CardArt';
 
-export function GameGrid() {
+export const CATEGORIES: GameCategory[] = ['maps', 'flags', 'strategy', 'nature'];
+
+/** Three dots, filled by difficulty (1 easy … 3 hard). */
+export function DifficultyBadge({ level }: { level: 1 | 2 | 3 }) {
+  const { t } = useI18n();
+  return (
+    <span className="meta-badge">
+      <span className="dots">{[1, 2, 3].map((d) => <i key={d} className={d <= level ? 'on' : ''} />)}</span>
+      {t(`diff.${level}`)}
+    </span>
+  );
+}
+
+export function GameCard({ g }: { g: GameMeta }) {
   const { t } = useI18n();
   const { progress } = useProgress();
-  const categories = ['maps', 'flags', 'strategy', 'nature'] as const;
+  const stats = progress.games[g.slug];
+  const style = { '--c': g.accent } as CSSProperties;
+  return (
+    <Link href={`/games/${g.slug}`} className="game-card" style={style}>
+      <div className="card-top">
+        <span className="no">{g.no}</span>
+        <span className="tag">{t(`game.${g.slug}.kind`)}</span>
+      </div>
+      <CardArt slug={g.slug} />
+      <h3>{t(gameName(g.slug))}</h3>
+      <p>{t(`game.${g.slug}.desc`)}</p>
+      <div className="card-meta">
+        <DifficultyBadge level={g.difficulty} />
+        <span className="meta-badge">⏱ {t('games.minutes', { n: g.minutes })}</span>
+      </div>
+      <div className="card-foot">
+        <span>{stats ? t('games.best', { n: stats.best, plays: stats.plays }) : t('games.notPlayed')}</span>
+        <span className="arrow">→</span>
+      </div>
+    </Link>
+  );
+}
 
+/** Games grouped by category; pass a filtered list to show a subset. */
+export function GameGrid({ games = GAMES.filter((g) => g.implemented) }: { games?: GameMeta[] }) {
+  const { t } = useI18n();
   return (
     <div id="games">
-      {categories.map((cat) => (
-        <div key={cat} className="section">
-          <div className="section-label">{t(`games.${cat}`)}</div>
-          <div className="game-grid">
-            {GAMES.filter((g) => g.category === cat).map((g) => {
-              const stats = progress.games[g.slug];
-              const style = { '--c': g.accent } as CSSProperties;
-              const body = (
-                <>
-                  <div className="card-top">
-                    <span className="no">{g.no}</span>
-                    <span className="tag">{g.implemented ? t(`game.${g.slug}.kind` as never) : t('games.soon')}</span>
-                  </div>
-                  <CardArt slug={g.slug} />
-                  <h3>{t(gameName(g.slug))}</h3>
-                  {g.implemented && <p>{t(`game.${g.slug}.desc` as never)}</p>}
-                  <div className="card-foot">
-                    <span>
-                      {!g.implemented ? t('games.soon') : stats ? t('games.best', { n: stats.best, plays: stats.plays }) : t('games.notPlayed')}
-                    </span>
-                    {g.implemented && <span className="arrow">→</span>}
-                  </div>
-                </>
-              );
-              return g.implemented ? (
-                <Link key={g.slug} href={`/games/${g.slug}`} className="game-card" style={style}>{body}</Link>
-              ) : (
-                <div key={g.slug} className="game-card soon" style={style}>{body}</div>
-              );
-            })}
+      {CATEGORIES.map((cat) => {
+        const list = games.filter((g) => g.category === cat);
+        if (!list.length) return null;
+        return (
+          <div key={cat} className="section">
+            <div className="section-label">{t(`games.${cat}`)} · {list.length}</div>
+            <div className="game-grid">{list.map((g) => <GameCard key={g.slug} g={g} />)}</div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
