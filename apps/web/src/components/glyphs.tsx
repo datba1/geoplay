@@ -106,6 +106,15 @@ export const GLYPHS: Record<string, ReactNode> = {
     </>
   ),
 
+  'combo-8': <path d="M56 24 L34 54 H48 L42 76 L66 44 H52 Z" />,
+  'hard-3star': (
+    <>
+      <path d="M28 64 L24 36 L38 48 L50 30 L62 48 L76 36 L72 64 Z" />
+      <path d="M28 72 H72" />
+      <circle cx="50" cy="52" r="4" className="fill" />
+    </>
+  ),
+
   /* items */
   coral: (
     <path d="M50 74 V52 M50 62 L40 52 V40 M50 54 L60 44 V32 M40 52 L32 46 V40 M60 44 L68 40 M40 44 L46 38 M60 38 L54 32 M36 74 H64" />

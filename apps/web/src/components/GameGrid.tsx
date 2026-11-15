@@ -3,11 +3,11 @@
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import { useI18n } from '@/lib/i18n';
-import { useProgress } from '@/lib/progress';
+import { bestStars, useProgress } from '@/lib/progress';
 import { GAMES, gameName, type GameCategory, type GameMeta } from '@/lib/games';
 import { CardArt } from './CardArt';
 
-export const CATEGORIES: GameCategory[] = ['maps', 'flags', 'strategy', 'nature'];
+export const CATEGORIES: GameCategory[] = ['maps', 'flags', 'data', 'strategy', 'nature'];
 
 /** Three dots, filled by difficulty (1 easy … 3 hard). */
 export function DifficultyBadge({ level }: { level: 1 | 2 | 3 }) {
@@ -39,7 +39,17 @@ export function GameCard({ g }: { g: GameMeta }) {
         <span className="meta-badge">⏱ {t('games.minutes', { n: g.minutes })}</span>
       </div>
       <div className="card-foot">
-        <span>{stats ? t('games.best', { n: stats.best, plays: stats.plays }) : t('games.notPlayed')}</span>
+        {stats ? (
+          <span className="card-progress">
+            <span className="mini-stars" aria-label={t('depth.starsLabel', { n: bestStars(stats) })}>
+              {[1, 2, 3].map((i) => <i key={i} className={i <= bestStars(stats) ? 'on' : ''}>★</i>)}
+            </span>
+            {t('games.best', { n: stats.best, plays: stats.plays })}
+            {(stats.stars?.hard ?? 0) > 0 && <span className="hard-mark" title={t('depth.hard')}>{t('depth.hard')}</span>}
+          </span>
+        ) : (
+          <span>{t('games.notPlayed')}</span>
+        )}
         <span className="arrow">→</span>
       </div>
     </Link>

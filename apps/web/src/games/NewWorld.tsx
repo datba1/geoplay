@@ -107,6 +107,7 @@ function countryDescriptors(world: World) {
 
 export function NewWorld({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  const AI_NOISE = ctx.pick(4, 1, 0.2);
   const [world, setWorld] = useState<World | null>(null);
   const map = useMemo(() => generate(ctx.seed), [ctx.seed]);
   const [owner, setOwner] = useState<(number | null)[]>(() => {
@@ -159,7 +160,7 @@ export function NewWorld({ ctx }: { ctx: GameContext }) {
       for (const c of map.cells) {
         const r = canTake(next, c.id, k);
         if (!r.ok) continue;
-        const s = (next[c.id] === null ? 2 : 3) + strength(next, c.id, k) - DEFENCE[c.terrain] * 0.5 + Math.random();
+        const s = (next[c.id] === null ? 2 : 3) + strength(next, c.id, k) - DEFENCE[c.terrain] * 0.5 + Math.random() * AI_NOISE;
         if (!best || s > best.s) best = { cell: c.id, s };
       }
       if (best) next[best.cell] = k;

@@ -36,7 +36,6 @@ const CHALLENGES: Challenge[] = [
 const W = 900;
 const H = 640;
 const RASTER = 0.4;
-const STAR_THRESHOLDS = [0.3, 0.45, 0.58];
 
 interface Shape { a2: string; d: string; area: number; hue: number }
 interface Piece { a2: string; x: number; y: number; rot: number }
@@ -134,6 +133,8 @@ function useEvaluator(frame: Shape | null) {
 
 export function TrueSize({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  // How much of the frame must be covered for 1, 2 and 3 stars.
+  const STAR_THRESHOLDS = ctx.pick([0.24, 0.38, 0.5], [0.3, 0.45, 0.58], [0.36, 0.52, 0.64]);
   const [world, setWorld] = useState<World | null>(null);
   const [challengeIdx, setChallengeIdx] = useState(() => Math.floor(mulberry32(ctx.seed)() * CHALLENGES.length));
   const [pieces, setPieces] = useState<Piece[]>([]);
@@ -262,11 +263,12 @@ export function TrueSize({ ctx }: { ctx: GameContext }) {
     ctx.finish(
       {
         points: Math.round(evaluation.fill * 1000),
+        stars,
         stamps: stars > 0 ? [challenge.frame, ...evaluation.good] : evaluation.good,
         flags: stars === 3 ? { 'ts-3star': true } : {},
         meta: { challenge: challenge.frame, fill: evaluation.fill, pieces: evaluation.good.length },
       },
-      { score: `${pct}%`, subtitle: '★'.repeat(stars) + '☆'.repeat(3 - stars) },
+      { score: `${pct}%` },
     );
   };
 

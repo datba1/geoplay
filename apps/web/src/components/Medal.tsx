@@ -28,7 +28,7 @@ const reeds = Array.from({ length: 72 }, (_, i) => {
 }).join('');
 
 /** The struck coin: reeded edge, polished rim, compass bezel and a recessed field with raised relief. */
-function Coin({ metal, children, bezel = true }: { metal: Metal; children: ReactNode; bezel?: boolean }) {
+function Coin({ metal, children, bezel = true, small = false }: { metal: Metal; children: ReactNode; bezel?: boolean; small?: boolean }) {
   const m = METALS[metal];
   const id = useId().replace(/:/g, '');
   return (
@@ -62,9 +62,18 @@ function Coin({ metal, children, bezel = true }: { metal: Metal; children: React
         </>
       )}
       {/* relief: shadow, highlight, then the face */}
-      <g transform="translate(0.9 1.1)" color={m.lo} opacity="0.9">{children}</g>
-      <g transform="translate(-0.6 -0.7)" color={m.hi} opacity="0.85">{children}</g>
-      <g color={m.ink} opacity={metal === 'iron' ? 0.9 : 0.75}>{children}</g>
+      {small ? (
+        <>
+          <g transform="translate(0 2)" color={m.hi} opacity="0.7">{children}</g>
+          <g color={m.edge}>{children}</g>
+        </>
+      ) : (
+        <>
+          <g transform="translate(0.9 1.1)" color={m.lo} opacity="0.9">{children}</g>
+          <g transform="translate(-0.6 -0.7)" color={m.hi} opacity="0.85">{children}</g>
+          <g color={m.ink} opacity={metal === 'iron' ? 0.9 : 0.75}>{children}</g>
+        </>
+      )}
       <circle cx="50" cy="50" r="44.5" fill={`url(#shine${id})`} />
     </>
   );
@@ -75,10 +84,10 @@ export function RankCoin({ tier, level, size = 34 }: { tier: Metal; level: numbe
   const digits = String(level).length;
   return (
     <svg className="coin" width={size} height={size} viewBox="-2 -2 104 104" role="img" aria-label={`Level ${level}`}>
-      <Coin metal={tier} bezel={size >= 48}>
+      <Coin metal={tier} bezel={size >= 48} small={size < 48}>
         <text
           x="50" y="51" textAnchor="middle" dominantBaseline="central" fill="currentColor"
-          style={{ font: `700 ${digits > 2 ? 26 : digits > 1 ? 32 : 40}px var(--font-display)` }}
+          style={{ font: `700 ${size < 48 ? (digits > 1 ? 40 : 52) : digits > 2 ? 26 : digits > 1 ? 32 : 40}px var(--font-display)` }}
         >
           {level}
         </text>

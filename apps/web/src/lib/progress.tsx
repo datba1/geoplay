@@ -43,7 +43,18 @@ export const bestStreak = (p: { streak: { count: number; best?: number } }) => M
 
 /* ---------------- state ---------------- */
 
-export interface GameStats { plays: number; best: number }
+export type Difficulty = 'easy' | 'normal' | 'hard';
+export const DIFFICULTIES: Difficulty[] = ['easy', 'normal', 'hard'];
+/** XP multiplier per difficulty. */
+export const DIFF_XP: Record<Difficulty, number> = { easy: 0.75, normal: 1, hard: 1.5 };
+/** 0–3 stars from the share of the game's maximum score. */
+export const starsFor = (points: number, max: number) => {
+  const r = max > 0 ? points / max : 0;
+  return r >= 0.85 ? 3 : r >= 0.6 ? 2 : r >= 0.35 ? 1 : 0;
+};
+export interface GameStats { plays: number; best: number; stars?: Partial<Record<Difficulty, number>> }
+/** Best star count over all difficulties. */
+export const bestStars = (g?: GameStats) => Math.max(0, ...Object.values(g?.stars ?? {}).map((n) => n ?? 0));
 
 export interface Progress {
   version: 1;
@@ -112,6 +123,8 @@ export const BADGES: BadgeDef[] = [
   { id: 'ts-3star', icon: '⭐', name: { en: 'Tetris master', vi: 'Bậc thầy xếp hình' }, desc: { en: 'Get 3 stars in True Size', vi: 'Đạt 3 sao trong Kích Thước Thật' }, test: (p) => !!p.flags['ts-3star'] },
   { id: 'ff-perfect', icon: '🦅', name: { en: 'Eagle eye', vi: 'Mắt đại bàng' }, desc: { en: 'Find all 8 faults in a Flag Fault run', vi: 'Tìm đủ 8 lỗi trong một lượt Cờ Sai' }, test: (p) => !!p.flags['ff-perfect'] },
   { id: 'bs-80', icon: '✍️', name: { en: 'Steady hand', vi: 'Tay vững' }, desc: { en: 'Draw a country with 80% match', vi: 'Vẽ một nước giống 80%' }, test: (p) => !!p.flags['bs-80'] },
+  { id: 'combo-8', icon: '⚡', name: { en: 'Chain reaction', vi: 'Phản ứng dây chuyền' }, desc: { en: 'Reach a ×8 combo', vi: 'Đạt chuỗi ×8' }, test: (p) => !!p.flags['combo-8'] },
+  { id: 'hard-3star', icon: '👑', name: { en: 'Hard as nails', vi: 'Cứng cựa' }, desc: { en: 'Get 3 stars on Hard', vi: 'Đạt 3 sao ở mức Khó' }, test: (p) => Object.values(p.games).some((g) => (g.stars?.hard ?? 0) >= 3) },
 ];
 
 /* ---------------- items ---------------- */
@@ -152,9 +165,16 @@ export interface FinishInput {
   /** set when the run belongs to today's daily challenge */
   daily?: { date: string; total: number } | null;
   meta?: Record<string, unknown>;
+  difficulty?: Difficulty;
+  /** games with their own star rule pass it here */
+  stars?: number;
+  /** extra XP earned in the run (combos, speed) */
+  bonusXp?: number;
 }
 
 export interface FinishResult {
+  stars: number;
+  newBest: boolean;
   xpGained: number;
   levelBefore: number;
   levelAfter: number;
@@ -232,7 +252,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const before = ref.current;
     const meta = gameMeta(input.slug);
     const ratio = meta ? Math.min(1, input.points / meta.maxPoints) : 0;
-    let xpGained = 10 + Math.round(ratio * 40);
+    const difficulty = input.difficulty ?? 'normal';
+    let xpGained = Math.round((10 + ratio * 40) * DIFF_XP[difficulty]) + Math.round(input.bonusXp ?? 0);
+    const stars = input.stars ?? (meta ? starsFor(input.points, meta.maxPoints) : 0);
 
     const prevGame = before.games[input.slug] ?? { plays: 0, best: 0 };
     const newStamps = [...new Set(input.stamps.map((s) => s.toUpperCase()))].filter((s) => !before.stamps.includes(s));
@@ -260,7 +282,14 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       ...before,
       xp: before.xp + xpGained,
       stamps: [...before.stamps, ...newStamps],
-      games: { ...before.games, [input.slug]: { plays: prevGame.plays + 1, best: Math.max(prevGame.best, input.points) } },
+      games: {
+        ...before.games,
+        [input.slug]: {
+          plays: prevGame.plays + 1,
+          best: Math.max(prevGame.best, input.points),
+          stars: { ...prevGame.stars, [difficulty]: Math.max(prevGame.stars?.[difficulty] ?? 0, stars) },
+        },
+      },
       daily,
       streak,
       flags: { ...before.flags, ...(input.flags ?? {}) },
@@ -278,7 +307,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           gameSlug: input.slug,
           points: Math.round(input.points),
           daily: !!input.daily,
-          meta: input.meta,
+          meta: { ...input.meta, difficulty },
         });
         submitted = 'ok';
         invalidate('lb.');
@@ -288,6 +317,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     }
 
     return {
+      stars,
+      newBest: prevGame.plays > 0 && input.points > prevGame.best,
       xpGained,
       levelBefore: levelInfo(before.xp).level,
       levelAfter: levelInfo(next.xp).level,

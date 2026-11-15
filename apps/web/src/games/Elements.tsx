@@ -74,8 +74,8 @@ const BASE = ['earth', 'water', 'fire', 'wind', 'time'];
 const TOTAL = RECIPES.length;
 
 addGameText({
-  en: { 'el.shelf': 'Your shelf', 'el.found': '{n} / {total} discovered', 'el.nothing': 'Nothing happens…', 'el.known': 'Already known: {name}', 'el.new': 'New: {name}!', 'el.finish': 'Finish', 'el.mix': 'Mix', 'el.clear': 'Clear', 'el.pick': 'Tap two elements to combine them.' },
-  vi: { 'el.shelf': 'Kệ của bạn', 'el.found': 'Đã khám phá {n} / {total}', 'el.nothing': 'Không có gì xảy ra…', 'el.known': 'Đã biết: {name}', 'el.new': 'Mới: {name}!', 'el.finish': 'Kết thúc', 'el.mix': 'Trộn', 'el.clear': 'Xoá', 'el.pick': 'Chạm hai nguyên tố để kết hợp.' },
+  en: { 'el.shelf': 'Your shelf', 'el.found': '{n} / {total} discovered', 'el.nothing': 'Nothing happens…', 'el.known': 'Already known: {name}', 'el.new': 'New: {name}!', 'el.finish': 'Finish', 'el.mix': 'Mix', 'el.clear': 'Clear', 'el.pick': 'Tap two elements to combine them.', 'el.hint': 'Hint ({n} left)', 'el.hintText': 'Try {a} + {b}', 'el.mixes': 'Mixes left', 'el.noMixes': 'No mixes left. Finish to bank your discoveries.' },
+  vi: { 'el.shelf': 'Kệ của bạn', 'el.found': 'Đã khám phá {n} / {total}', 'el.nothing': 'Không có gì xảy ra…', 'el.known': 'Đã biết: {name}', 'el.new': 'Mới: {name}!', 'el.finish': 'Kết thúc', 'el.mix': 'Trộn', 'el.clear': 'Xoá', 'el.pick': 'Chạm hai nguyên tố để kết hợp.', 'el.hint': 'Gợi ý (còn {n})', 'el.hintText': 'Thử {a} + {b}', 'el.mixes': 'Lượt trộn còn', 'el.noMixes': 'Hết lượt trộn. Bấm Kết thúc để ghi nhận.' },
 });
 
 export function Elements({ ctx }: { ctx: GameContext }) {
@@ -84,8 +84,20 @@ export function Elements({ ctx }: { ctx: GameContext }) {
   const [slots, setSlots] = useState<string[]>([]);
   const [last, setLast] = useState<{ id: string | null; text: string; fresh: boolean } | null>(null);
   const name = (id: string) => EL[id][lang];
+  // Easy: plenty of hints, unlimited mixing. Hard: no hints and a limited number of mixes.
+  const [hints, setHints] = useState(ctx.pick(5, 2, 0));
+  const [mixesLeft, setMixesLeft] = useState<number>(ctx.pick(Infinity, 90, 45));
+
+  const revealHint = () => {
+    if (!hints) return;
+    const pair = RECIPES.find(([a, b, r]) => known.includes(a) && known.includes(b) && !known.includes(r));
+    if (!pair) return;
+    setHints((h) => h - 1);
+    setLast({ id: null, text: t('el.hintText', { a: name(pair[0]), b: name(pair[1]) }), fresh: false });
+  };
 
   const add = (id: string) => {
+    if (mixesLeft <= 0) return;
     const next = slots.length >= 2 ? [id] : [...slots, id];
     setSlots(next);
     if (next.length === 2) mix(next[0], next[1]);
@@ -93,6 +105,9 @@ export function Elements({ ctx }: { ctx: GameContext }) {
 
   const mix = (a: string, b: string) => {
     const r = BOOK.get(key(a, b));
+    setMixesLeft((m) => m - 1);
+    if (r && !known.includes(r)) ctx.hit(true);
+    else if (!r) ctx.hit(false);
     if (!r) setLast({ id: null, text: t('el.nothing'), fresh: false });
     else if (known.includes(r)) setLast({ id: r, text: t('el.known', { name: name(r) }), fresh: false });
     else {
@@ -145,6 +160,11 @@ export function Elements({ ctx }: { ctx: GameContext }) {
         <div className="row" style={{ flexWrap: 'wrap' }}>
           {known.map((k) => EL[k].place).filter(Boolean).map((p, i) => <img key={i} src={flagUrl(p!)} alt={p} width={30} style={{ borderRadius: 3 }} />)}
         </div>
+        {Number.isFinite(mixesLeft) && <div className="stat-box"><small>{t('el.mixes')}</small><b>{Math.max(0, mixesLeft)}</b></div>}
+        {mixesLeft <= 0 && <p className="small pill-bad">{t('el.noMixes')}</p>}
+        {ctx.difficulty !== 'hard' && (
+          <button className="btn" onClick={revealHint} disabled={!hints}>💡 {t('el.hint', { n: hints })}</button>
+        )}
         <button className="btn btn-primary" onClick={finish} disabled={found === 0}>{t('el.finish')}</button>
       </aside>
     </div>

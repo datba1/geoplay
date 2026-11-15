@@ -12,6 +12,10 @@ const POOL = [
   'IT', 'CL', 'VN', 'FR', 'BR', 'IN', 'AU', 'EG', 'MX', 'ES', 'TH', 'AR', 'DE', 'PL', 'UA', 'TR', 'IR', 'PE',
   'MN', 'KZ', 'ZA', 'NG', 'MG', 'CU', 'SE', 'CN', 'SO', 'SA', 'LY', 'IS', 'LA', 'KH', 'GB', 'US', 'PT', 'NO',
 ];
+/** The most iconic outlines, used on Easy. */
+const EASY_POOL = ['IT', 'CL', 'VN', 'FR', 'BR', 'IN', 'AU', 'EG', 'MX', 'ES', 'GB', 'US', 'CN', 'IS', 'MG', 'CU'];
+/** Extra, less familiar outlines added on Hard. */
+const HARD_EXTRA = ['BO', 'VE', 'CO', 'ET', 'TZ', 'AF', 'PK', 'MM', 'MY', 'PH', 'NZ', 'FI', 'RO', 'GR', 'JP', 'KR'];
 const ROUNDS = 5;
 const SIZE = 600;
 const GRID = 200;
@@ -81,7 +85,9 @@ function targetRing(world: World, a2: string): Pt[] {
 export function BorderSketch({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
   const [world, setWorld] = useState<World | null>(null);
-  const [countries] = useState(() => shuffle(POOL, mulberry32(ctx.seed)).slice(0, ROUNDS));
+  const [countries] = useState(() =>
+    shuffle(ctx.pick(EASY_POOL, POOL, [...POOL, ...HARD_EXTRA]), mulberry32(ctx.seed)).slice(0, ROUNDS),
+  );
   const [round, setRound] = useState(0);
   const [stroke, setStroke] = useState<Pt[]>([]);
   const [drawing, setDrawing] = useState(false);
@@ -169,6 +175,7 @@ export function BorderSketch({ ctx }: { ctx: GameContext }) {
     const u = areaCentroid(stroke);
     setResult({ match, truth: normalize(truthRaw, u.area, u.cx, u.cy) });
     setScores((s) => [...s, Math.round(match * 100)]);
+    ctx.hit(match >= 0.6);
   };
 
   const next = () => {

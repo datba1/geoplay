@@ -17,10 +17,7 @@ addGameText({
 const W = 960;
 const H = 480;
 const DURATION = 60;
-const SIM_MIN_PER_SEC = 4; // band drifts 1° of longitude per real second
 const SPEED = 1.7; // degrees per second (great-circle equivalent)
-const BAND_LOW = -6;
-const BAND_HIGH = 4;
 const D2R = Math.PI / 180;
 
 const declination = (day: number) => -23.44 * Math.cos(((2 * Math.PI) / 365) * (day + 10));
@@ -37,6 +34,10 @@ const y = (lat: number) => ((90 - lat) / 180) * H;
 
 export function SunsetChase({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  // Easy: a wide, slow band. Hard: a thin band that races west.
+  const BAND_LOW = ctx.pick(-8, -6, -4);
+  const BAND_HIGH = ctx.pick(6, 4, 2);
+  const SIM_MIN_PER_SEC = ctx.pick(3, 4, 5.5);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [world, setWorld] = useState<World | null>(null);
   const [running, setRunning] = useState(false);

@@ -47,9 +47,9 @@ function crossed(world: World, bounds: Map<string, [[number, number], [number, n
 
 interface Puzzle { a: P; b: P; target: string[] }
 
-function makePuzzles(world: World, bounds: Map<string, [[number, number], [number, number]]>, seed: number): Puzzle[] {
+function makePuzzles(world: World, bounds: Map<string, [[number, number], [number, number]]>, seed: number, base: number, minArea: number): Puzzle[] {
   const rand = mulberry32(seed);
-  const pool = world.countries.filter((c) => c.areaKm2 > 60_000);
+  const pool = world.countries.filter((c) => c.areaKm2 > minArea);
   const out: Puzzle[] = [];
   let guard = 0;
   while (out.length < PUZZLES && guard++ < 400) {
@@ -57,7 +57,7 @@ function makePuzzles(world: World, bounds: Map<string, [[number, number], [numbe
     const dist = (geoDistance(ca.centroid, cb.centroid) * 180) / Math.PI;
     if (dist < 12 || dist > 55) continue;
     const set = crossed(world, bounds, ca.centroid, cb.centroid);
-    const want = 2 + out.length; // 2, 3, 4 countries: puzzles get harder
+    const want = base + out.length; // puzzles get harder; the base count depends on difficulty
     if (set.size < want || set.size > want + 1) continue;
     if (out.some((p) => p.target.join() === [...set].sort().join())) continue;
     out.push({ a: ca.centroid, b: cb.centroid, target: [...set].sort() });
@@ -67,6 +67,8 @@ function makePuzzles(world: World, bounds: Map<string, [[number, number], [numbe
 
 export function GlobeCut({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  const BASE = ctx.pick(1, 2, 3);
+  const MIN_AREA = ctx.pick(150_000, 60_000, 25_000);
   const [world, setWorld] = useState<World | null>(null);
   const [idx, setIdx] = useState(0);
   const [points, setPoints] = useState<P[]>([]);
@@ -79,7 +81,7 @@ export function GlobeCut({ ctx }: { ctx: GameContext }) {
 
   useEffect(() => { loadWorld().then(setWorld); }, []);
   const bounds = useMemo(() => new Map(world?.countries.map((c) => [c.a2, geoBounds(c.feature) as [[number, number], [number, number]]]) ?? []), [world]);
-  const puzzles = useMemo(() => (world ? makePuzzles(world, bounds, ctx.seed) : []), [world, bounds, ctx.seed]);
+  const puzzles = useMemo(() => (world ? makePuzzles(world, bounds, ctx.seed, BASE, MIN_AREA) : []), [world, bounds, ctx.seed, BASE, MIN_AREA]);
   const puzzle = puzzles[idx];
   const order = useMemo(() => (puzzle ? shuffle(puzzle.target, mulberry32(ctx.seed + idx)) : []), [puzzle, ctx.seed, idx]);
 
@@ -99,6 +101,7 @@ export function GlobeCut({ ctx }: { ctx: GameContext }) {
     const hit = crossed(world, bounds, next[0], next[1]);
     const solved = hit.size === puzzle.target.length && puzzle.target.every((c) => hit.has(c));
     setResult({ hit, solved });
+    ctx.hit(solved);
     if (solved) {
       setScore((s) => s + [300, 200, 100][TRIES - tries]);
       setStamps((s) => [...s, ...puzzle.target]);

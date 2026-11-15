@@ -1,4 +1,4 @@
-export type GameCategory = 'maps' | 'flags' | 'strategy' | 'nature';
+export type GameCategory = 'maps' | 'flags' | 'data' | 'strategy' | 'nature';
 
 export interface GameMeta {
   slug: string;
@@ -24,9 +24,13 @@ export const GAMES: GameMeta[] = [
   { slug: 'sunset-chase', no: '08', category: 'maps', icon: '🌇', accent: '#ffb26b', difficulty: 2, minutes: 2, maxPoints: 600, implemented: true },
   { slug: 'quake-hunt', no: '09', category: 'maps', icon: '📡', accent: '#f87171', difficulty: 3, minutes: 4, maxPoints: 1000, implemented: true },
   { slug: 'nation-scales', no: '10', category: 'maps', icon: '⚖️', accent: '#fbbf24', difficulty: 2, minutes: 4, maxPoints: 1000, implemented: true },
+  { slug: 'capital-pin', no: '17', category: 'maps', icon: '📍', accent: '#fbbf24', difficulty: 2, minutes: 3, maxPoints: 1000, implemented: true },
+  { slug: 'silhouette', no: '18', category: 'maps', icon: '🗺️', accent: '#e9e2cf', difficulty: 1, minutes: 3, maxPoints: 1000, implemented: true },
   { slug: 'flag-fault', no: '03', category: 'flags', icon: '🔍', accent: '#5eead4', difficulty: 2, minutes: 3, maxPoints: 2000, implemented: true },
   { slug: 'flag-painter', no: '06', category: 'flags', icon: '🎨', accent: '#ff8fb1', difficulty: 2, minutes: 4, maxPoints: 1000, implemented: true },
   { slug: 'flag-mashup', no: '11', category: 'flags', icon: '🧵', accent: '#93c5fd', difficulty: 2, minutes: 3, maxPoints: 1000, implemented: true },
+  { slug: 'higher-lower', no: '19', category: 'data', icon: '📊', accent: '#60a5fa', difficulty: 1, minutes: 3, maxPoints: 1000, implemented: true, needsStats: true },
+  { slug: 'north-south', no: '20', category: 'data', icon: '🧭', accent: '#4fd1a1', difficulty: 2, minutes: 3, maxPoints: 1000, implemented: true },
   { slug: 'border-chess', no: '12', category: 'strategy', icon: '♞', accent: '#f5c66b', difficulty: 3, minutes: 8, maxPoints: 1000, implemented: true },
   { slug: 'border-go', no: '13', category: 'strategy', icon: '⚫', accent: '#e2e8f0', difficulty: 3, minutes: 8, maxPoints: 1000, implemented: true },
   { slug: 'diplomacy', no: '14', category: 'strategy', icon: '🃏', accent: '#86efac', difficulty: 2, minutes: 6, maxPoints: 1000, implemented: true },

@@ -14,8 +14,6 @@ const FAMILIAR = [
 ];
 
 const ROUNDS = 8;
-const SECONDS = 15;
-const PENALTY = 3;
 
 type Phase = 'loading' | 'playing' | 'found' | 'timeout';
 /** Fault bounding box, relative to the flag stage (so scrolling doesn't matter). */
@@ -123,6 +121,8 @@ function plantFault(stage: HTMLElement, rand: () => number): Fault | null {
 
 export function FlagFault({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  const SECONDS = ctx.pick(22, 15, 10);
+  const PENALTY = ctx.pick(2, 3, 4);
   const [order] = useState(() => shuffle(FAMILIAR, mulberry32(ctx.seed)));
   const randRef = useRef(mulberry32(ctx.seed ^ 0x9e3779b9));
   const [cursor, setCursor] = useState(0); // index into `order` (skips flags without candidates)
@@ -167,7 +167,7 @@ export function FlagFault({ ctx }: { ctx: GameContext }) {
     deadline.current = performance.now() + SECONDS * 1000;
     setTimeLeft(SECONDS);
     setPhase('playing');
-  }, [svgText, order.length]);
+  }, [svgText, order.length, SECONDS]);
 
   const showHint = useCallback(() => {
     const r = faultRef.current!.rect;
@@ -183,12 +183,13 @@ export function FlagFault({ ctx }: { ctx: GameContext }) {
       setTimeLeft(left);
       if (left <= 0) {
         setPhase('timeout');
+        ctx.hit(false);
         setMessage(t('ff.timeout'));
         showHint();
       }
     }, 100);
     return () => clearInterval(id);
-  }, [phase, showHint, t]);
+  }, [phase, showHint, t, ctx]);
 
   const next = useCallback(() => {
     if (round + 1 >= ROUNDS) {
@@ -218,7 +219,8 @@ export function FlagFault({ ctx }: { ctx: GameContext }) {
     const inside = x >= r.left - tol && x <= r.left + r.width + tol && y >= r.top - tol && y <= r.top + r.height + tol;
     if (inside) {
       const left = Math.max(0, (deadline.current - performance.now()) / 1000);
-      setScore((s) => s + 100 + Math.round(left * 10));
+      setScore((s) => s + 100 + Math.round((left / SECONDS) * 150));
+      ctx.hit(true);
       setFound((f) => [...f, a2]);
       setPhase('found');
       setMessage(t('ff.correct'));

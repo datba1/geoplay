@@ -15,11 +15,13 @@ addGameText({
 });
 
 const ROUNDS = 6;
-const SECONDS = 25;
-const PENALTY = 3;
 
 export function ShadowHunt({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  const SECONDS = ctx.pick(35, 25, 15);
+  const PENALTY = ctx.pick(2, 3, 5);
+  // Easy: big, well-known countries. Hard: almost everything, including small states.
+  const MIN_AREA = ctx.pick(450_000, 120_000, 20_000);
   const [world, setWorld] = useState<World | null>(null);
   const [round, setRound] = useState(0);
   const [rotation, setRotation] = useState<[number, number]>([-100, -15]);
@@ -34,9 +36,9 @@ export function ShadowHunt({ ctx }: { ctx: GameContext }) {
   useEffect(() => { loadWorld().then(setWorld); }, []);
   const targets = useMemo(() => {
     if (!world) return [];
-    const pool = world.countries.filter((c) => c.areaKm2 > 120_000 && c.a2 !== 'AQ');
+    const pool = world.countries.filter((c) => c.areaKm2 > MIN_AREA && c.a2 !== 'AQ');
     return shuffle(pool, mulberry32(ctx.seed)).slice(0, ROUNDS).map((c) => c.a2);
-  }, [world, ctx.seed]);
+  }, [world, ctx.seed, MIN_AREA]);
   const target = targets[round];
 
   const silhouette = useMemo(() => {
@@ -60,7 +62,10 @@ export function ShadowHunt({ ctx }: { ctx: GameContext }) {
     const id = setInterval(() => {
       const left = Math.max(0, (deadline.current - performance.now()) / 1000);
       setTimeLeft(left);
-      if (left <= 0) reveal('timeout');
+      if (left <= 0) {
+        ctx.hit(false);
+        reveal('timeout');
+      }
     }, 100);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,6 +84,7 @@ export function ShadowHunt({ ctx }: { ctx: GameContext }) {
       const left = Math.max(0, (deadline.current - performance.now()) / 1000);
       setScore((s) => s + 100 + Math.round((left / SECONDS) * 100));
       setFound((f) => [...f, a2]);
+      ctx.hit(true);
       reveal('found');
     } else {
       deadline.current -= PENALTY * 1000;

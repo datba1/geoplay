@@ -60,7 +60,7 @@ function play(graph: Graph, board: Board, at: string, who: Owner) {
   return { board: next, captured };
 }
 
-function aiChoose(graph: Graph, board: Board, values: Map<string, number>) {
+function aiChoose(graph: Graph, board: Board, values: Map<string, number>, noise = 0.4) {
   let best: string | null = null;
   let bestScore = -Infinity;
   for (const c of graph.keys()) {
@@ -72,7 +72,7 @@ function aiChoose(graph: Graph, board: Board, values: Map<string, number>) {
     if (own.libs.size === 1) s -= values.get(c)! + 3; // self-atari
     // pressure: reduce liberties of adjacent player groups
     for (const n of graph.get(c) ?? []) if (r.board.get(n) === 'p' && group(graph, r.board, n).libs.size === 1) s += 2;
-    s += Math.random() * 0.4;
+    s += Math.random() * noise;
     if (s > bestScore) { bestScore = s; best = c; }
   }
   return best;
@@ -80,6 +80,7 @@ function aiChoose(graph: Graph, board: Board, values: Map<string, number>) {
 
 export function BorderGo({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  const AI_NOISE = ctx.pick(6, 0.4, 0.03);
   const [world, setWorld] = useState<World | null>(null);
   const [board, setBoard] = useState<Board>(new Map());
   const [turn, setTurn] = useState<Owner>('p');
@@ -127,7 +128,7 @@ export function BorderGo({ ctx }: { ctx: GameContext }) {
 
   useEffect(() => {
     if (turn !== 'a' || over || !graph.size) return;
-    const id = setTimeout(() => doMove(aiChoose(graph, board, values), 'a'), 500);
+    const id = setTimeout(() => doMove(aiChoose(graph, board, values, AI_NOISE), 'a'), 500);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [turn, over]);

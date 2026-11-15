@@ -12,7 +12,6 @@ import { IslandMarks } from '@/components/IslandMarks';
 const W = 960;
 const H = 500;
 const ROUNDS = 6;
-const SECONDS = 20;
 const MIN_SCALE = 0.06;
 const MAX_SCALE = 3.2;
 
@@ -58,20 +57,23 @@ function formatValue(v: number, unit: string, lang: string) {
 
 interface Round { answer: StatIndicator; options: StatIndicator[] }
 
-function makeRounds(indicators: StatIndicator[], seed: number): Round[] {
+function makeRounds(indicators: StatIndicator[], seed: number, extra: number, similar: boolean): Round[] {
   const rand = mulberry32(seed);
   const order = shuffle(indicators, rand);
   return Array.from({ length: Math.min(ROUNDS, order.length) }, (_, i) => {
     const answer = order[i];
-    // Prefer distractors from other groups so similar maps (e.g. population vs urban) rarely compete.
+    // Easier levels prefer distractors from other groups; Hard puts look-alike maps side by side.
     const others = shuffle(indicators.filter((x) => x.slug !== answer.slug), rand)
-      .sort((a, b) => Number(a.group === answer.group) - Number(b.group === answer.group));
-    return { answer, options: shuffle([answer, ...others.slice(0, 3)], rand) };
+      .sort((a, b) => (similar ? -1 : 1) * (Number(a.group === answer.group) - Number(b.group === answer.group)));
+    return { answer, options: shuffle([answer, ...others.slice(0, extra)], rand) };
   });
 }
 
 export function WarpedMap({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  const SECONDS = ctx.pick(30, 20, 12);
+  const EXTRA = ctx.pick(2, 3, 5);
+  const SIMILAR = ctx.difficulty === 'hard';
   const [world, setWorld] = useState<World | null>(null);
   const [indicators, setIndicators] = useState<StatIndicator[] | null>(null);
   const [error, setError] = useState(false);
@@ -94,7 +96,7 @@ export function WarpedMap({ ctx }: { ctx: GameContext }) {
     const path = geoPath(projection);
     return { sphere: path({ type: 'Sphere' }) ?? '', lines: path(geoGraticule10()) ?? '' };
   }, []);
-  const rounds = useMemo(() => (indicators ? makeRounds(indicators, ctx.seed) : []), [indicators, ctx.seed]);
+  const rounds = useMemo(() => (indicators ? makeRounds(indicators, ctx.seed, EXTRA, SIMILAR) : []), [indicators, ctx.seed, EXTRA, SIMILAR]);
   const islandProjection = useMemo(() => geoEqualEarth().fitExtent([[10, 10], [W - 10, H - 10]], { type: 'Sphere' }), []);
   const current = rounds[round];
   const scales = useMemo(() => (current ? scalesFor(shapes, current.answer.values) : {}), [shapes, current]);
@@ -110,21 +112,25 @@ export function WarpedMap({ ctx }: { ctx: GameContext }) {
       setTimeLeft(SECONDS);
     }, 350);
     return () => clearTimeout(id);
-  }, [current, shapes.length]);
+  }, [current, shapes.length, SECONDS]);
 
   useEffect(() => {
     if (!warped || picked) return;
     const id = setInterval(() => {
       const left = Math.max(0, Math.min(SECONDS, (deadline.current - performance.now()) / 1000));
       setTimeLeft(left);
-      if (left <= 0) setPicked('__timeout');
+      if (left <= 0) {
+        setPicked('__timeout');
+        ctx.hit(false);
+      }
     }, 100);
     return () => clearInterval(id);
-  }, [warped, picked]);
+  }, [warped, picked, SECONDS, ctx]);
 
   const choose = (slug: string) => {
     if (picked || !current) return;
     setPicked(slug);
+    ctx.hit(slug === current.answer.slug);
     if (slug === current.answer.slug) {
       setScore((s) => s + 150 + Math.round((timeLeft / SECONDS) * 50));
       setCorrect((c) => [...c, slug]);

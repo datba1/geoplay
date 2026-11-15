@@ -202,6 +202,54 @@ function ElementsArt() {
   );
 }
 
+function CapitalPinArt() {
+  return (
+    <svg {...common}>
+      <path d="M14 30c14-8 30-6 42 0s26 8 38 2 30-6 52 2" opacity=".35" />
+      <path d="M14 62c18-6 34-2 48 4s30 4 44-2 26-4 40 2" opacity=".35" />
+      <circle cx="58" cy="54" r="3" fill="currentColor" fillOpacity=".5" />
+      <path d="M58 54 L96 34" strokeDasharray="3 4" opacity=".7" />
+      <path d="M96 14c-8 0-13 6-13 13 0 10 13 22 13 22s13-12 13-22c0-7-5-13-13-13z" fill="currentColor" fillOpacity=".22" />
+      <circle cx="96" cy="27" r="4.5" />
+    </svg>
+  );
+}
+
+function SilhouetteArt() {
+  return (
+    <svg {...common}>
+      <path d="M62 16l10 6 4 12 10 4-2 12 8 10-6 10-12 2-6 8-10-4-4-10-10-6 2-12-6-10 8-8 2-10z" fill="currentColor" fillOpacity=".3" />
+      <path d="M110 30h30M110 46h22M110 62h26" opacity=".55" />
+      <path d="M104 30h-1M104 46h-1M104 62h-1" strokeWidth="3" />
+    </svg>
+  );
+}
+
+function HigherLowerArt() {
+  return (
+    <svg {...common}>
+      <rect x="34" y="40" width="26" height="40" rx="3" fill="currentColor" fillOpacity=".2" />
+      <rect x="100" y="18" width="26" height="62" rx="3" fill="currentColor" fillOpacity=".4" />
+      <path d="M20 80h120" opacity=".5" />
+      <path d="M74 54l6-8 6 8M80 46v20" opacity=".8" />
+      <path d="M47 30h0M113 8h0" strokeWidth="4" />
+    </svg>
+  );
+}
+
+function NorthSouthArt() {
+  return (
+    <svg {...common}>
+      <circle cx="80" cy="46" r="32" opacity=".5" />
+      <path d="M80 18l7 28-7 28-7-28z" />
+      <path d="M80 18l7 28h-14z" fill="currentColor" fillOpacity=".5" />
+      <path d="M20 30h34M106 62h34" strokeDasharray="3 4" opacity=".6" />
+      <circle cx="26" cy="30" r="3" fill="currentColor" />
+      <circle cx="134" cy="62" r="3" fill="currentColor" fillOpacity=".5" />
+    </svg>
+  );
+}
+
 const ARTS: Record<string, () => React.JSX.Element> = {
   'true-size': TrueSizeArt,
   'border-sketch': BorderSketchArt,
@@ -219,6 +267,10 @@ const ARTS: Record<string, () => React.JSX.Element> = {
   diplomacy: DiplomacyArt,
   'new-world': NewWorldArt,
   elements: ElementsArt,
+  'capital-pin': CapitalPinArt,
+  silhouette: SilhouetteArt,
+  'higher-lower': HigherLowerArt,
+  'north-south': NorthSouthArt,
 };
 
 export function CardArt({ slug }: { slug: string }) {

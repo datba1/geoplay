@@ -22,12 +22,15 @@ addGameText({
 });
 
 const ROUNDS = 5;
-const TESTS = 3;
 type StatKey = 'area' | 'population' | 'gdp';
 interface Round { stat: StatKey; big: string; tray: string[] }
 
 export function NationScales({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  // Weighings allowed before committing, tray size and how strictly the balance is scored.
+  const TESTS = ctx.pick(5, 3, 1);
+  const TRAY = ctx.pick(8, 10, 14);
+  const STRICT = ctx.pick(1.5, 2, 3);
   const [world, setWorld] = useState<World | null>(null);
   const [values, setValues] = useState<Partial<Record<StatKey, Record<string, number>>> | null>(null);
   const [idx, setIdx] = useState(0);
@@ -67,9 +70,9 @@ export function NationScales({ ctx }: { ctx: GameContext }) {
       const target = v[big];
       let small = ranked.filter(([c, x]) => c !== big && x > target * 0.03 && x < target * 0.55).map(([c]) => c);
       if (small.length < 6) small = ranked.filter(([c, x]) => c !== big && x < target).map(([c]) => c);
-      return { stat, big, tray: shuffle(small, rand).slice(0, 10) };
+      return { stat, big, tray: shuffle(small, rand).slice(0, TRAY) };
     });
-  }, [world, values, ctx.seed]);
+  }, [world, values, ctx.seed, TRAY]);
 
   const round = rounds[idx];
   if (!round || !values) return <div className="card muted">{t('common.loading')}</div>;
@@ -99,7 +102,8 @@ export function NationScales({ ctx }: { ctx: GameContext }) {
 
   const commit = () => {
     const off = Math.abs(sum - target) / target;
-    const pts = Math.round(200 * Math.max(0, 1 - off * 2));
+    const pts = Math.round(200 * Math.max(0, 1 - off * STRICT));
+    ctx.hit(off < 0.1);
     setScore((s) => s + pts);
     if (off < 0.15) setStamps((s) => [...s, round.big, ...load]);
     setTilt(angleFor(sum));

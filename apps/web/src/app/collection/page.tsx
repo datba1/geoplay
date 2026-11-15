@@ -12,7 +12,7 @@ import { BadgeMedal, ItemTag, type Metal } from '@/components/Medal';
 const BADGE_METAL: Record<string, Metal> = {
   departure: 'bronze', explorer: 'bronze', 'stamps-10': 'bronze', 'daily-1': 'bronze',
   'stamps-30': 'silver', 'level-5': 'silver', 'streak-3': 'silver', 'ts-3star': 'silver', 'bs-80': 'silver',
-  'stamps-75': 'gold', 'level-10': 'gold', 'streak-7': 'gold', 'ff-perfect': 'gold',
+  'stamps-75': 'gold', 'level-10': 'gold', 'streak-7': 'gold', 'ff-perfect': 'gold', 'combo-8': 'silver', 'hard-3star': 'gold',
 };
 
 type Tab = 'passport' | 'badges' | 'items';

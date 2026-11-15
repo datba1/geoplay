@@ -1,4 +1,4 @@
-export type GameCategory = 'maps' | 'flags' | 'strategy' | 'nature';
+export type GameCategory = 'maps' | 'flags' | 'data' | 'strategy' | 'nature';
 
 export interface GameInfo {
   slug: string;
@@ -26,6 +26,10 @@ export const GAMES: GameInfo[] = [
   { slug: 'diplomacy', category: 'strategy', kind: 'strategy', maxPoints: 1000, implemented: true },
   { slug: 'new-world', category: 'strategy', kind: 'strategy', maxPoints: 1000, implemented: true },
   { slug: 'elements', category: 'nature', kind: 'discovery', maxPoints: 1000, implemented: true },
+  { slug: 'capital-pin', category: 'maps', kind: 'capitals', maxPoints: 1000, implemented: true },
+  { slug: 'silhouette', category: 'maps', kind: 'shapes', maxPoints: 1000, implemented: true },
+  { slug: 'higher-lower', category: 'data', kind: 'data', maxPoints: 1000, implemented: true },
+  { slug: 'north-south', category: 'data', kind: 'capitals', maxPoints: 1000, implemented: true },
 ];
 
 export const findGame = (slug: string) => GAMES.find((g) => g.slug === slug);

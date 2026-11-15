@@ -29,23 +29,25 @@ const CLIPS: Record<Layout, string[]> = {
   h3: ['0,0 640,0 640,160 0,160', '0,160 640,160 640,320 0,320', '0,320 640,320 640,480 0,480'],
 };
 
-function makeRounds(seed: number): Round[] {
+function makeRounds(seed: number, layouts: Layout[], optionCount: number): Round[] {
   const rand = mulberry32(seed);
   const pool = shuffle([...new Set(POOL)], rand);
-  const layouts: Layout[] = ['v2', 'h2', 'd2', 'v3', 'h3'];
   let i = 0;
   return shuffle(layouts, rand).map((layout) => {
     const n = CLIPS[layout].length;
     const sources = pool.slice(i, i + n);
     i += n;
-    const distractors = shuffle(pool.filter((c) => !sources.includes(c)), rand).slice(0, 8 - n);
+    const distractors = shuffle(pool.filter((c) => !sources.includes(c)), rand).slice(0, optionCount - n);
     return { sources, layout, options: shuffle([...sources, ...distractors], rand) };
   });
 }
 
 export function FlagMashup({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
-  const rounds = useMemo(() => makeRounds(ctx.seed), [ctx.seed]);
+  // Easy: two-piece flags and few options. Hard: mostly three pieces among many options.
+  const layouts = ctx.pick<Layout[]>(['v2', 'h2', 'd2', 'v2', 'h2'], ['v2', 'h2', 'd2', 'v3', 'h3'], ['v3', 'h3', 'd2', 'v3', 'h3']);
+  const optionCount = ctx.pick(6, 8, 12);
+  const rounds = useMemo(() => makeRounds(ctx.seed, layouts, optionCount), [ctx.seed]); // eslint-disable-line react-hooks/exhaustive-deps
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string[]>([]);
   const [done, setDone] = useState(false);
@@ -64,6 +66,7 @@ export function FlagMashup({ ctx }: { ctx: GameContext }) {
     const wrong = picked.length - ok;
     setScore((s) => s + Math.max(0, Math.round((200 * (ok - wrong * 0.5)) / n)));
     setStamps((s) => [...s, ...picked.filter((c) => r.sources.includes(c))]);
+    ctx.hit(ok === n && wrong === 0);
     setDone(true);
   };
 

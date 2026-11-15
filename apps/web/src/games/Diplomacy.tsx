@@ -31,6 +31,7 @@ type StatKey = 'area' | 'population' | 'gdp' | 'forest' | 'borders';
 
 export function Diplomacy({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  const AI_NOISE = ctx.pick(2, 0.1, 0.01);
   const [world, setWorld] = useState<World | null>(null);
   const [stats, setStats] = useState<Partial<Record<StatKey, Record<string, number>>>>({});
   const [owners, setOwners] = useState<Map<string, Owner>>(new Map());
@@ -111,7 +112,7 @@ export function Diplomacy({ ctx }: { ctx: GameContext }) {
           if (owners.get(n) === 'a') continue;
           for (const k of statKeys) {
             const ratio = (value(k, c) + 1) / (value(k, n) + 1);
-            const s = Math.log(ratio) + (owners.get(n) === 'p' ? 0.4 : 0) + Math.log10(world!.byA2.get(n)!.areaKm2) * 0.1 + Math.random() * 0.1;
+            const s = Math.log(ratio) + (owners.get(n) === 'p' ? 0.4 : 0) + Math.log10(world!.byA2.get(n)!.areaKm2) * 0.1 + Math.random() * AI_NOISE;
             if (!best || s > best.s) best = { f: c, to: n, k, s };
           }
         }

@@ -72,7 +72,7 @@ function allMoves(graph: Graph, pieces: Piece[], side: Side) {
 }
 
 /** Greedy one-ply AI that also checks the player's best reply. */
-function aiMove(graph: Graph, pieces: Piece[]) {
+function aiMove(graph: Graph, pieces: Piece[], noise = 0.3, caution = 9) {
   const playerKing = pieces.find((p) => p.side === 'p' && p.kind === 'k');
   const kingDist = playerKing ? bfs(graph, playerKing.at) : new Map<string, number>();
   let best: { id: string; to: string } | null = null;
@@ -87,10 +87,10 @@ function aiMove(graph: Graph, pieces: Piece[]) {
       const victim = after.find((p) => p.at === r.to);
       if (victim) worst = Math.max(worst, VALUE[victim.kind]);
     }
-    s -= worst * 9;
+    s -= worst * caution;
     const mover = after.find((p) => p.id === m.id)!;
     if (mover.kind !== 'k') s -= (kingDist.get(m.to) ?? 8) * 0.4;
-    s += Math.random() * 0.3;
+    s += Math.random() * noise;
     if (s > bestScore) { bestScore = s; best = m; }
   }
   return best;
@@ -98,6 +98,9 @@ function aiMove(graph: Graph, pieces: Piece[]) {
 
 export function BorderChess({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  // Easy: the computer plays loosely and rarely sees your replies. Hard: precise and careful.
+  const AI_NOISE = ctx.pick(14, 0.3, 0.02);
+  const AI_CAUTION = ctx.pick(2, 9, 12);
   const [world, setWorld] = useState<World | null>(null);
   const [pieces, setPieces] = useState<Piece[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
@@ -139,6 +142,7 @@ export function BorderChess({ ctx }: { ctx: GameContext }) {
     setMoves(total);
     setLog((l) => [describe(mover, to, cap), ...l].slice(0, 6));
     const caps = cap && mover.side === 'p' ? [...captured, to] : captured;
+    if (cap && mover.side === 'p') ctx.hit(true);
     if (cap && mover.side === 'p') setCaptured(caps);
     if (cap?.kind === 'k') return finish(mover.side === 'p' ? 'win' : 'lose', total, caps);
     if (total >= MAX_MOVES) return finish('draw', total, caps);
@@ -148,7 +152,7 @@ export function BorderChess({ ctx }: { ctx: GameContext }) {
   useEffect(() => {
     if (turn !== 'a' || over || !pieces.length) return;
     const id = setTimeout(() => {
-      const m = aiMove(graph, pieces);
+      const m = aiMove(graph, pieces, AI_NOISE, AI_CAUTION);
       if (m) move(m.id, m.to);
       else finish('draw', moves, captured);
     }, 550);

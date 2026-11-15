@@ -27,7 +27,6 @@ const W = 960;
 const H = 500;
 const ROUNDS = 5;
 const R_KM = 6371;
-const ERROR = 0.08;
 const MAX_STATIONS = 5;
 type P = [number, number];
 
@@ -35,7 +34,7 @@ interface Station { a2: string; at: P; estKm: number }
 interface Quake { epi: P; stations: Station[] }
 
 /** Builds a quake with five candidate stations (shown one by one). */
-function makeQuake(world: World, rand: () => number): Quake {
+function makeQuake(world: World, rand: () => number, ERROR: number): Quake {
   const epi: P = [-180 + rand() * 360, -55 + rand() * 120];
   const pool = shuffle(world.countries.filter((c) => c.areaKm2 > 50_000), rand);
   // Stations between ~800 and ~9000 km away keep rings readable.
@@ -52,6 +51,9 @@ function makeQuake(world: World, rand: () => number): Quake {
 
 export function QuakeHunt({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  // Seismometer error: Hard stations are much less precise.
+  const ERROR = ctx.pick(0.04, 0.08, 0.14);
+  const SCORE_KM = ctx.pick(3600, 3000, 2400);
   const [world, setWorld] = useState<World | null>(null);
   const [round, setRound] = useState(0);
   const [shown, setShown] = useState(2);
@@ -65,8 +67,8 @@ export function QuakeHunt({ ctx }: { ctx: GameContext }) {
   const quakes = useMemo(() => {
     if (!world) return [];
     const rand = mulberry32(ctx.seed);
-    return Array.from({ length: ROUNDS }, () => makeQuake(world, rand));
-  }, [world, ctx.seed]);
+    return Array.from({ length: ROUNDS }, () => makeQuake(world, rand, ERROR));
+  }, [world, ctx.seed, ERROR]);
   const quake = quakes[round];
 
   const projection = useMemo(() => geoEqualEarth().fitExtent([[8, 8], [W - 8, H - 8]], { type: 'Sphere' }), []);
@@ -80,8 +82,9 @@ export function QuakeHunt({ ctx }: { ctx: GameContext }) {
     if (!p || Number.isNaN(p[0])) return;
     setGuess(p as P);
     const errKm = geoDistance(p as P, quake.epi) * R_KM;
-    const pts = Math.max(0, Math.round(200 * Math.max(0, 1 - errKm / 3000)) - (shown - 2) * 25);
+    const pts = Math.max(0, Math.round(200 * Math.max(0, 1 - errKm / SCORE_KM)) - (shown - 2) * 25);
     setRoundScore(pts);
+    ctx.hit(errKm < 1000);
     setScore((s) => s + pts);
     const place = countryAt(world!, quake.epi);
     if (place && errKm < 1000) setStamps((s) => [...s, place]);

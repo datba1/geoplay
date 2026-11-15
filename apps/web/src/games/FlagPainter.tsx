@@ -22,7 +22,7 @@ const BLANK = '#e8e6e1';
 interface Area { el: SVGGeometryElement; truth: string; shades: string[]; chosen: string | null }
 
 /** Five near-identical options for one official colour (the true one included). */
-function shadesFor([r, g, b]: [number, number, number], rand: () => number): { truth: string; shades: string[] } {
+function shadesFor([r, g, b]: [number, number, number], rand: () => number, spread = 1, count = 4): { truth: string; shades: string[] } {
   const truth = `rgb(${r}, ${g}, ${b})`;
   const [h, s, l] = rgbToHsl(r, g, b);
   const variants: string[] = [];
@@ -32,13 +32,16 @@ function shadesFor([r, g, b]: [number, number, number], rand: () => number): { t
     variants.push('#1c1f26', '#2a2320', '#151a22', '#262626');
   } else {
     const deltas: [number, number, number][] = [[10, 0, 0.04], [-10, 0.05, -0.04], [4, -0.15, 0.07], [-5, 0.1, -0.08], [14, 0.08, 0.02], [-14, -0.08, 0.05]];
-    for (const [dh, ds, dl] of shuffle(deltas, rand).slice(0, 4)) variants.push(hsl(h + dh, s + ds, l + dl));
+    for (const [dh, ds, dl] of shuffle(deltas, rand).slice(0, count)) variants.push(hsl(h + dh * spread, s + ds * spread, l + dl * spread));
   }
-  return { truth, shades: shuffle([truth, ...variants], rand) };
+  return { truth, shades: shuffle([truth, ...variants.slice(0, count)], rand) };
 }
 
 export function FlagPainter({ ctx }: { ctx: GameContext }) {
   const { t, lang } = useI18n();
+  // Easy: three clearly different shades. Hard: five very close ones.
+  const SPREAD = ctx.pick(2.2, 1, 0.6);
+  const SHADES = ctx.pick(2, 4, 4);
   const [order] = useState(() => shuffle(POOL, mulberry32(ctx.seed)));
   const rand = useRef(mulberry32(ctx.seed ^ 0x51ed));
   const [cursor, setCursor] = useState(0);
@@ -66,7 +69,7 @@ export function FlagPainter({ ctx }: { ctx: GameContext }) {
     const found = visibleFilledShapes(stageRef.current, 0.004);
     if (found.length < 2 || found.length > MAX_AREAS) { setCursor((c) => c + 1); return; }
     const list = found.map(({ el, color }, i) => {
-      const { truth, shades } = shadesFor(color, rand.current);
+      const { truth, shades } = shadesFor(color, rand.current, SPREAD, SHADES);
       el.style.fill = BLANK;
       el.style.stroke = '#1a1d26';
       el.style.strokeWidth = '1.5px';
@@ -78,7 +81,7 @@ export function FlagPainter({ ctx }: { ctx: GameContext }) {
     setAreas(list);
     setSelected(0);
     setChecked(null);
-  }, [svgText]);
+  }, [svgText]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onStageClick = (e: React.MouseEvent) => {
     if (checked) return;
@@ -107,6 +110,7 @@ export function FlagPainter({ ctx }: { ctx: GameContext }) {
     setChecked({ ok, all: areas.length });
     setScore((s) => s + Math.round((200 * ok) / areas.length));
     if (ok === areas.length) setStamps((s) => [...s, a2]);
+    ctx.hit(ok === areas.length);
     // reveal true colours on the wrong areas
     setTimeout(() => areas.forEach((a) => (a.el.style.fill = a.truth)), 900);
   };
