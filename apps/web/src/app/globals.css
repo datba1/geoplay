@@ -85,7 +85,7 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
 .logo-text i { color: var(--accent); }
 .logo-sub { font-size: 9px; letter-spacing: 0.22em; color: var(--muted); text-transform: uppercase; }
 .nav { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,0.02); }
-.nav a { padding: 6px 14px; border-radius: 999px; font-size: 13px; color: var(--muted); font-weight: 500; }
+.nav a { display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 999px; font-size: 13px; color: var(--muted); font-weight: 500; }
 .nav a:hover, .nav a.active { color: var(--text); background: rgba(255,255,255,0.06); }
 .icon-btn { width: 38px; height: 38px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,0.03); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
 .player-chip { display: flex; align-items: center; gap: 10px; padding: 4px 12px 4px 4px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,0.03); }
@@ -569,3 +569,41 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
   .otd-body { grid-template-columns: 1fr; gap: 6px; }
 }
 
+
+/* ================= tinted cards ================= */
+/* Each card: a soft three-colour wash plus a glow in the top-right corner. */
+:root { --tA: #fb923c; --tB: #a78bfa; --tC: #5eead4; --glow: #fdba74; }
+.tint-violet { --tA: #a78bfa; --tB: #5eead4; --tC: #fb923c; --glow: #c4b5fd; }
+.tint-teal { --tA: #5eead4; --tB: #60a5fa; --tC: #a78bfa; --glow: #99f6e4; }
+.tint-rose { --tA: #fb7185; --tB: #fb923c; --tC: #a78bfa; --glow: #fda4af; }
+.tint-sky { --tA: #60a5fa; --tB: #5eead4; --tC: #a78bfa; --glow: #93c5fd; }
+.tint-gold { --tA: #facc15; --tB: #fb923c; --tC: #5eead4; --glow: #fde047; }
+
+.card, .medallion, .medallion.on, .quiz-card, .quiz-card.tone-fun, .quiz-card.tone-surprise, .flip-face, .flip-back,
+.profile-card, .bonus-locked, .daily, .otd, .empty-album {
+  background:
+    radial-gradient(260px circle at 100% 0%, color-mix(in srgb, var(--glow) 25%, transparent), transparent 70%),
+    linear-gradient(120deg, color-mix(in srgb, var(--tA) 10%, transparent), color-mix(in srgb, var(--tB) 8%, transparent) 60%, color-mix(in srgb, var(--tC) 6%, transparent)),
+    var(--panel);
+}
+.game-card, .ex-tile {
+  background:
+    radial-gradient(260px circle at 100% 0%, color-mix(in srgb, var(--c) 25%, transparent), transparent 70%),
+    linear-gradient(120deg, color-mix(in srgb, var(--c) 10%, transparent), rgba(167,139,250,0.08) 60%, rgba(94,234,212,0.06)),
+    var(--panel);
+}
+/* locked collectibles stay quieter */
+
+/* colour rotation inside grids */
+:is(.medallions, .quiz-grid, .grid-3, .drop-grid, .daily-games) > :nth-child(6n+2), :is(.drop-grid) > :nth-child(2) .flip-face { --tA: #a78bfa; --tB: #5eead4; --tC: #fb923c; --glow: #c4b5fd; }
+:is(.medallions, .quiz-grid, .grid-3) > :nth-child(6n+3) { --tA: #5eead4; --tB: #60a5fa; --tC: #a78bfa; --glow: #99f6e4; }
+:is(.medallions, .quiz-grid, .grid-3) > :nth-child(6n+4) { --tA: #fb7185; --tB: #fb923c; --tC: #a78bfa; --glow: #fda4af; }
+:is(.medallions, .quiz-grid, .grid-3) > :nth-child(6n+5) { --tA: #60a5fa; --tB: #5eead4; --tC: #a78bfa; --glow: #93c5fd; }
+:is(.medallions, .quiz-grid, .grid-3) > :nth-child(6n) { --tA: #facc15; --tB: #fb923c; --tC: #5eead4; --glow: #fde047; }
+.medallions > .medallion:not(.on) { --glow: #64748b; --tA: #64748b; --tB: #475569; --tC: #334155; }
+.otd { --tA: #facc15; --tB: #fb923c; --tC: #a78bfa; --glow: #fde047; }
+.profile-card { --tA: #facc15; --tB: #a78bfa; --tC: #5eead4; --glow: #fdba74; }
+
+.nav-icon { flex: none; }
+.nav a:not(.active) .nav-icon { opacity: 0.85; }
+.mobile-nav .nav-icon { display: block; margin: 0 auto 2px; }

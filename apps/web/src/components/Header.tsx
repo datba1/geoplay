@@ -6,6 +6,7 @@ import { useI18n, LANGS } from '@/lib/i18n';
 import { levelInfo, useProgress } from '@/lib/progress';
 import { LogoMark } from './Logo';
 import { RankMedal } from './RankMedal';
+import { NavIcon } from './NavIcon';
 
 export function Header() {
   const { t, lang, setLang } = useI18n();
@@ -15,11 +16,11 @@ export function Header() {
   const nextLang = LANGS[(LANGS.findIndex((l) => l.code === lang) + 1) % LANGS.length];
 
   const links = [
-    { href: '/games', label: t('nav.games') },
-    { href: '/collection', label: t('nav.collection') },
-    { href: '/leaderboard', label: t('nav.leaderboard') },
-    { href: '/handbook', label: t('nav.handbook') },
-    { href: '/facts', label: t('nav.factsShort') },
+    { href: '/games', icon: 'games', label: t('nav.games') },
+    { href: '/collection', icon: 'collection', label: t('nav.collection') },
+    { href: '/leaderboard', icon: 'leaderboard', label: t('nav.leaderboard') },
+    { href: '/handbook', icon: 'handbook', label: t('nav.handbook') },
+    { href: '/facts', icon: 'facts', label: t('nav.factsShort') },
   ];
 
   return (
@@ -35,6 +36,7 @@ export function Header() {
         <nav className="nav">
           {links.map((l) => (
             <Link key={l.href} href={l.href} className={pathname === l.href || (l.href === '/games' && pathname.startsWith('/games')) ? 'active' : ''}>
+              <NavIcon name={l.icon} />
               {l.label}
             </Link>
           ))}
