@@ -437,15 +437,7 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
   background: radial-gradient(500px 200px at 0% 0%, rgba(245,196,92,0.10), transparent 70%), linear-gradient(160deg, var(--panel-2), var(--panel));
 }
 .rank-medal { position: relative; display: inline-block; flex: none; width: 112px; height: 112px; }
-.rank-medal svg { width: 100%; height: 100%; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.45)); }
-.rank-medal .rim { stroke: rgba(0,0,0,0.25); stroke-width: 1.5; }
-.rank-medal .face { stroke: rgba(255,255,255,0.55); stroke-width: 2; stroke-dasharray: 2 3; }
-.rank-medal.bronze .rim { fill: #b7743f; } .rank-medal.bronze .face { fill: #d9935a; }
-.rank-medal.silver .rim { fill: #9ea7b5; } .rank-medal.silver .face { fill: #d4dae3; }
-.rank-medal.gold .rim { fill: #c9952c; } .rank-medal.gold .face { fill: #f1c757; }
-.rank-medal.platinum .rim { fill: #6fb5c4; } .rank-medal.platinum .face { fill: #c7f0f7; }
-.rank-medal .lvl { position: absolute; inset: 0 0 8% 0; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; line-height: 1; color: #2b1607; text-shadow: 0 1px 0 rgba(255,255,255,0.35); }
-.rank-title { display: inline-block; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: var(--gold); }
+.rank-title { display: inline-block; font: italic 500 17px var(--font-display); color: var(--gold); }
 .profile-name { display: flex; align-items: center; gap: 10px; }
 .profile-name h1 { margin: 2px 0; font-size: clamp(26px, 4vw, 36px); }
 .profile-name .icon-btn { width: 32px; height: 32px; }
@@ -456,7 +448,7 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
 .profile-stats div { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 8px; border-radius: 12px; background: rgba(255,255,255,0.03); }
 .profile-stats b { font: 700 22px var(--font-display); }
 .profile-stats small { font-size: 12px; color: var(--muted); font-weight: 500; }
-.profile-stats span { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
+.profile-stats span { font-size: 12px; color: var(--muted); text-align: center; }
 
 .collection-bar { display: flex; align-items: center; gap: 12px; margin: 22px 0 16px; }
 
@@ -490,20 +482,32 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
 .slot.inked img { width: 46%; aspect-ratio: 1; object-fit: cover; border-radius: 50%; border: 1.5px solid var(--ink); filter: saturate(0.85); }
 .slot.inked span { color: var(--ink); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 9.5px; }
 
-.medallions { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
-.medallion { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 20px 14px; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); }
-.medallion .disc { width: 78px; height: 78px; border-radius: 50%; display: grid; place-items: center; font-size: 34px; background: rgba(255,255,255,0.04); border: 2px dashed var(--line-2); filter: grayscale(1); opacity: 0.45; margin-bottom: 6px; }
-.medallion .disc.square { border-radius: 22px; }
-.medallion.on { border-color: rgba(245,196,92,0.35); background: linear-gradient(180deg, rgba(245,196,92,0.07), var(--panel) 60%); }
-.medallion.on .disc { filter: none; opacity: 1; border: 3px solid #f5c45c; background: radial-gradient(circle at 35% 30%, #fff1c2, #d8a43c 70%); box-shadow: 0 6px 18px rgba(245,196,92,0.25), inset 0 0 0 4px rgba(255,255,255,0.25); }
-.medallion.item.on .disc { background: radial-gradient(circle at 35% 30%, #d6fff5, #39a58c 75%); border-color: var(--teal); box-shadow: 0 6px 18px rgba(94,234,212,0.2); }
-.medallion .chip { margin-top: auto; font-size: 11px; }
+.medallions { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px; }
+.medallion { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 6px 14px 18px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); }
+.medallion b { font-size: 15px; }
+.medallion.on { background: radial-gradient(120px 90px at 50% 30%, rgba(245,196,92,0.10), transparent 70%), var(--panel); border-color: rgba(245,196,92,0.25); }
+.badge-medal { display: block; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35)); margin-bottom: 4px; }
+.badge-medal.locked { opacity: 0.7; }
+.rarity { font: italic 500 13px var(--font-display); }
+.rarity.bronze { color: #d99a63; } .rarity.silver { color: #c7cfd8; } .rarity.gold { color: var(--gold); }
+.medallion:not(.on) .rarity { color: var(--muted); }
+.medallions.items { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.item-tag { display: block; margin: 10px 0 6px; transform: rotate(-3deg); filter: drop-shadow(0 6px 8px rgba(0,0,0,0.35)); }
+.medallion:nth-child(even) .item-tag { transform: rotate(2.5deg); }
+.item-tag .tag-paper { fill: #efe2c4; stroke: #c9b184; stroke-width: 1.2; }
+.item-tag .tag-hole { fill: var(--panel); }
+.item-tag .tag-ring { stroke: #b08a4a; }
+.item-tag .tag-ink { color: #4a3420; }
+.item-tag .tag-rule { stroke: #b49a6c; stroke-width: 1.2; }
+.item-tag.locked .tag-paper { fill: #3a3d45; stroke: #4b4f58; }
+.item-tag.locked .tag-ink { color: #8d93a0; }
+.item-tag.locked .tag-rule { stroke: #555a64; }
+.glyph .fill { fill: currentColor; }
 .chip-on { border-color: rgba(79,209,161,0.5); color: var(--green); }
 
 @media (max-width: 860px) {
   .profile-card { grid-template-columns: auto 1fr; gap: 16px; padding: 18px; }
-  .profile-card .rank-medal { width: 84px !important; height: 84px !important; }
-  .profile-card .rank-medal .lvl { font-size: 27px !important; }
+  .profile-card .rank-medal, .profile-card .rank-medal svg { width: 84px !important; height: 84px !important; }
   .profile-stats { grid-column: 1 / -1; grid-template-columns: repeat(5, 1fr); }
   .profile-stats b { font-size: 18px; }
   .profile-stats span { font-size: 9px; letter-spacing: 0.04em; }
@@ -511,7 +515,7 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
   .passport-cover h2 { font-size: 17px; }
   .passport-page { padding: 16px 14px 20px; }
   .stamp-slots { grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 10px 6px; }
-  .medallions { grid-template-columns: repeat(2, 1fr); }
+  .medallions, .medallions.items { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ================= facts page ================= */
@@ -565,4 +569,3 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
   .otd-body { grid-template-columns: 1fr; gap: 6px; }
 }
 
-.player-chip .rank-medal svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }

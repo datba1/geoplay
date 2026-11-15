@@ -7,6 +7,13 @@ import { countryName, flagUrl } from '@/lib/geo';
 import { CONTINENTS, PASSPORT_COUNTRIES, TOTAL_COUNTRIES } from '@/lib/continents';
 import { openNicknameModal } from '@/components/NicknameModal';
 import { RankMedal } from '@/components/RankMedal';
+import { BadgeMedal, ItemTag, type Metal } from '@/components/Medal';
+
+const BADGE_METAL: Record<string, Metal> = {
+  departure: 'bronze', explorer: 'bronze', 'stamps-10': 'bronze', 'daily-1': 'bronze',
+  'stamps-30': 'silver', 'level-5': 'silver', 'streak-3': 'silver', 'ts-3star': 'silver', 'bs-80': 'silver',
+  'stamps-75': 'gold', 'level-10': 'gold', 'streak-7': 'gold', 'ff-perfect': 'gold',
+};
 
 type Tab = 'passport' | 'badges' | 'items';
 const TABS: Tab[] = ['passport', 'badges', 'items'];
@@ -133,12 +140,13 @@ export default function CollectionPage() {
         <section className="medallions">
           {BADGES.map((b) => {
             const on = progress.badges.includes(b.id);
+            const metal = BADGE_METAL[b.id] ?? 'bronze';
             return (
               <div key={b.id} className={`medallion ${on ? 'on' : ''}`}>
-                <div className="disc"><span>{b.icon}</span></div>
+                <BadgeMedal glyph={b.id} metal={metal} locked={!on} size={78} />
+                <span className={`rarity ${metal}`}>{t(`tier.${metal}`)}</span>
                 <b>{b.name[lang]}</b>
-                <span className="muted small">{b.desc[lang]}</span>
-                <span className={`chip ${on ? 'chip-on' : ''}`}>{on ? t('col.earned') : t('col.lockedShort')}</span>
+                <span className="muted small">{on ? b.desc[lang] : `🔒 ${b.desc[lang]}`}</span>
               </div>
             );
           })}
@@ -147,14 +155,14 @@ export default function CollectionPage() {
 
       {/* ---------- items ---------- */}
       {tab === 'items' && (
-        <section className="medallions">
+        <section className="medallions items">
           {ITEMS.map((it) => {
             const on = it.level <= info.level;
             return (
               <div key={it.id} className={`medallion item ${on ? 'on' : ''}`}>
-                <div className="disc square"><span>{it.icon}</span></div>
+                <ItemTag glyph={it.id} locked={!on} size={92} />
                 <b>{it.name[lang]}</b>
-                <span className={`chip ${on ? 'chip-on' : ''}`}>{on ? t('col.owned') : t('col.locked', { n: it.level })}</span>
+                <span className="muted small">{on ? t('col.owned') : t('col.locked', { n: it.level })}</span>
               </div>
             );
           })}
