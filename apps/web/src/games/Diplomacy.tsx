@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { addGameText } from '@/lib/gameText';
-import { api } from '@/lib/api';
+import { cachedApi } from '@/lib/api';
 import { countryName, flagUrl, formatKm2, loadWorld, type World } from '@/lib/geo';
 import { REGIONS, regionGraph, bfs } from '@/lib/regions';
 import { mulberry32 } from '@/lib/rng';
@@ -43,7 +43,7 @@ export function Diplomacy({ ctx }: { ctx: GameContext }) {
 
   useEffect(() => {
     loadWorld().then(setWorld);
-    api.stats().then((s) => {
+    cachedApi.stats().then((s) => {
       const pick = (slug: string) => s.indicators.find((i) => i.slug === slug)?.values;
       setStats({ population: pick('population'), gdp: pick('gdp'), forest: pick('forest') });
     }).catch(() => {});

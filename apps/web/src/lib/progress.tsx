@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { api, ApiError, cleanNickname } from './api';
+import { invalidate } from './cache';
 import { gameMeta } from './games';
 
 /* ---------------- levels ---------------- */
@@ -246,6 +247,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           meta: input.meta,
         });
         submitted = 'ok';
+        invalidate('lb.');
       } catch (e) {
         submitted = e instanceof ApiError && e.status >= 400 && e.status < 500 ? 'rejected' : 'offline';
       }

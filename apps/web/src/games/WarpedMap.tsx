@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { geoEqualEarth, geoPath, geoGraticule10 } from 'd3-geo';
 import { useI18n } from '@/lib/i18n';
-import { api, type StatIndicator } from '@/lib/api';
+import { cachedApi, type StatIndicator } from '@/lib/api';
 import { countryName, loadWorld, type World } from '@/lib/geo';
 import { mulberry32, shuffle } from '@/lib/rng';
 import { GameShell, type GameContext } from '@/components/GameShell';
@@ -85,7 +85,7 @@ export function WarpedMap({ ctx }: { ctx: GameContext }) {
 
   useEffect(() => {
     loadWorld().then(setWorld);
-    api.stats().then((s) => setIndicators(s.indicators)).catch(() => setError(true));
+    cachedApi.stats().then((s) => setIndicators(s.indicators)).catch(() => setError(true));
   }, []);
 
   const shapes = useMemo(() => (world ? buildShapes(world) : []), [world]);

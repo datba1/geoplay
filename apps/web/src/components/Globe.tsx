@@ -1,9 +1,43 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { geoContains, geoOrthographic, geoPath, geoGraticule10 } from 'd3-geo';
+import { geoEquirectangular, geoOrthographic, geoPath, geoGraticule10 } from 'd3-geo';
+import type { Feature, MultiPolygon } from 'geojson';
 import { loadWorld } from '@/lib/geo';
 import { ARCHIPELAGOS } from '@/lib/islands';
+
+/**
+ * Land sample points for the dotted globe. Instead of testing thousands of points
+ * against the coastline polygons (seconds of main-thread work on slow devices), the
+ * land is drawn once onto a small equirectangular canvas and pixels are read back.
+ */
+function landDots(land: Feature<MultiPolygon>): [number, number][] {
+  const w = 720, h = 360; // 0.5° per pixel
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+  const proj = geoEquirectangular().scale(w / (2 * Math.PI)).translate([w / 2, h / 2]);
+  ctx.beginPath();
+  geoPath(proj, ctx)(land);
+  ctx.fillStyle = '#000';
+  ctx.fill();
+  const px = ctx.getImageData(0, 0, w, h).data;
+  const isLand = (lon: number, lat: number) => {
+    const x = Math.min(w - 1, Math.max(0, Math.floor(((lon + 180) / 360) * w)));
+    const y = Math.min(h - 1, Math.max(0, Math.floor(((90 - lat) / 180) * h)));
+    return px[(y * w + x) * 4 + 3] > 127;
+  };
+  const pts: [number, number][] = [];
+  const step = 2.4;
+  for (let lat = -84; lat <= 84; lat += step) {
+    const lonStep = step / Math.max(0.25, Math.cos((lat * Math.PI) / 180));
+    for (let lon = -180; lon < 180; lon += lonStep) if (isLand(lon, lat)) pts.push([lon, lat]);
+  }
+  // Island groups too small for the 1:110m land data.
+  for (const a of ARCHIPELAGOS) pts.push(...a.points);
+  return pts;
+}
 
 /** Rotating dotted globe drawn on canvas. Drag to spin it. */
 export function Globe({ size = 380 }: { size?: number }) {
@@ -31,18 +65,7 @@ export function Globe({ size = 380 }: { size?: number }) {
 
     loadWorld().then((world) => {
       if (!alive) return;
-      // Sample land on a lat/lon grid (denser in longitude near the equator).
-      const pts: [number, number][] = [];
-      const step = 2.4;
-      for (let lat = -84; lat <= 84; lat += step) {
-        const lonStep = step / Math.max(0.25, Math.cos((lat * Math.PI) / 180));
-        for (let lon = -180; lon < 180; lon += lonStep) {
-          if (geoContains(world.land, [lon, lat])) pts.push([lon, lat]);
-        }
-      }
-      // Island groups too small for the 1:110m land data.
-      for (const a of ARCHIPELAGOS) pts.push(...a.points);
-      dots = pts;
+      dots = landDots(world.land);
     });
 
     const draw = (time: number) => {

@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api, type Fact } from '@/lib/api';
+import { api, cacheKeys, type Fact } from '@/lib/api';
+import { TTL, useCached } from '@/lib/cache';
 import { useI18n } from '@/lib/i18n';
 
 const CATEGORY_ICON: Record<string, string> = {
@@ -34,20 +35,15 @@ export function FactFlip({ fact }: { fact: Fact }) {
 
 export function FactCard() {
   const { t, lang } = useI18n();
-  const [facts, setFacts] = useState<Fact[] | null>(null);
-  const [index, setIndex] = useState(0);
-  const [todayIndex, setTodayIndex] = useState(0);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    Promise.all([api.facts(lang), api.factToday(lang)])
-      .then(([all, today]) => {
-        setFacts(all);
-        setIndex(today.index);
-        setTodayIndex(today.index);
-      })
-      .catch(() => setError(true));
-  }, [lang]);
+  const all = useCached<Fact[]>(cacheKeys.facts(lang), TTL.day, () => api.facts(lang));
+  const today = useCached(cacheKeys.factToday(lang), TTL.hour, () => api.factToday(lang));
+  const facts = all.data ?? null;
+  const todayIndex = today.data?.index ?? 0;
+  const [index, setIndex] = useState<number | null>(null);
+  const error = !facts && !!all.error;
+  // Start on today's card once it is known; keep the user's position after that.
+  useEffect(() => setIndex(null), [lang]);
+  const shown = index ?? todayIndex;
 
   const placeholder = (text: string) => (
     <div>
@@ -57,16 +53,16 @@ export function FactCard() {
   );
   if (error) return placeholder(t('daily.offline'));
   if (!facts) return placeholder(t('common.loading'));
-  const fact = facts[index];
+  const fact = facts[Math.min(shown, facts.length - 1)];
 
   return (
     <div>
       <div className="section-label">{t('fact.eyebrow')}</div>
       <FactFlip fact={fact} />
       <div className="row" style={{ marginTop: 10 }}>
-        <button className="btn btn-sm" onClick={() => setIndex((i) => (i - 1 + facts.length) % facts.length)}>‹</button>
-        <span className="small muted">{index === todayIndex ? t('fact.today') : ''} {index + 1} / {facts.length}</span>
-        <button className="btn btn-sm" onClick={() => setIndex((i) => (i + 1) % facts.length)}>›</button>
+        <button className="btn btn-sm" onClick={() => setIndex((shown - 1 + facts.length) % facts.length)}>‹</button>
+        <span className="small muted">{shown === todayIndex ? t('fact.today') : ''} {shown + 1} / {facts.length}</span>
+        <button className="btn btn-sm" onClick={() => setIndex((shown + 1) % facts.length)}>›</button>
       </div>
     </div>
   );

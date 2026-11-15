@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { api, type Leaderboard } from '@/lib/api';
+import { useState } from 'react';
+import { api, cacheKeys, type Leaderboard } from '@/lib/api';
+import { TTL, useCached } from '@/lib/cache';
 import { useI18n } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress';
 import { GAMES, gameName } from '@/lib/games';
@@ -13,16 +14,11 @@ export default function LeaderboardPage() {
   const { progress, ready } = useProgress();
   const [game, setGame] = useState<string>('');
   const [period, setPeriod] = useState<(typeof PERIODS)[number]>('all');
-  const [data, setData] = useState<Leaderboard | null>(null);
-  const [error, setError] = useState(false);
+  const params = { game: game || undefined, period, playerId: progress.playerId, limit: 50 };
+  const lb = useCached<Leaderboard>(ready ? cacheKeys.leaderboard(params) : null, 15_000, () => api.leaderboard(params));
+  const data = lb.data ?? null;
+  const error = !data && !!lb.error;
 
-  useEffect(() => {
-    if (!ready) return;
-    setError(false);
-    api.leaderboard({ game: game || undefined, period, playerId: progress.playerId, limit: 50 })
-      .then(setData)
-      .catch(() => setError(true));
-  }, [game, period, ready, progress.playerId]);
 
   return (
     <div className="container">

@@ -87,3 +87,27 @@ export const api = {
     return request<Leaderboard>(`/leaderboard?${q.toString()}`);
   },
 };
+
+/* ------------------------------------------------------------------ */
+/* Cached versions (stale-while-revalidate, see lib/cache.ts)          */
+/* ------------------------------------------------------------------ */
+import { cachedFetch, TTL } from './cache';
+
+/** Day key matching the API's daily reset (UTC+7). */
+export const dayKey = () => new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10);
+
+export const cacheKeys = {
+  daily: () => `daily.${dayKey()}`,
+  facts: (lang: string) => `facts.${lang}`,
+  factToday: (lang: string) => `factToday.${lang}.${dayKey()}`,
+  stats: () => 'stats',
+  leaderboard: (p: Record<string, unknown>) => `lb.${JSON.stringify(p)}`,
+};
+
+export const cachedApi = {
+  daily: () => cachedFetch(cacheKeys.daily(), TTL.tenMinutes, api.daily),
+  facts: (lang: string) => cachedFetch(cacheKeys.facts(lang), TTL.day, () => api.facts(lang)),
+  factToday: (lang: string) => cachedFetch(cacheKeys.factToday(lang), TTL.hour, () => api.factToday(lang)),
+  /** World Bank figures change yearly: keep them a day. */
+  stats: () => cachedFetch(cacheKeys.stats(), TTL.day, api.stats),
+};

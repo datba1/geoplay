@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { addGameText } from '@/lib/gameText';
-import { api } from '@/lib/api';
+import { cachedApi } from '@/lib/api';
 import { countryName, flagUrl, formatKm2, loadWorld, type World } from '@/lib/geo';
 import { mulberry32, shuffle } from '@/lib/rng';
 import { GameShell, type GameContext } from '@/components/GameShell';
@@ -43,7 +43,7 @@ export function NationScales({ ctx }: { ctx: GameContext }) {
     loadWorld().then((w) => {
       setWorld(w);
       const area = Object.fromEntries(w.countries.map((c) => [c.a2, c.areaKm2]));
-      api.stats()
+      cachedApi.stats()
         .then((s) => {
           const pick = (slug: string) => s.indicators.find((i) => i.slug === slug)?.values;
           setValues({ area, population: pick('population'), gdp: pick('gdp') });

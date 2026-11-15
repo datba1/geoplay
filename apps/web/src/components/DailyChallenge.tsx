@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { api, type DailyChallenge as Daily } from '@/lib/api';
+import { api, cacheKeys, type DailyChallenge as Daily } from '@/lib/api';
+import { TTL, useCached } from '@/lib/cache';
 import { useI18n } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress';
 import { gameMeta, gameName } from '@/lib/games';
@@ -23,13 +24,11 @@ function useCountdown(target: string | null) {
 export function DailyChallenge() {
   const { t, lang } = useI18n();
   const { progress } = useProgress();
-  const [daily, setDaily] = useState<Daily | null>(null);
-  const [error, setError] = useState(false);
+  const { data, error: fetchError } = useCached<Daily>(cacheKeys.daily(), TTL.tenMinutes, api.daily);
+  const daily = data ?? null;
+  const error = !daily && !!fetchError;
   const countdown = useCountdown(daily?.resetsAt ?? null);
 
-  useEffect(() => {
-    api.daily().then(setDaily).catch(() => setError(true));
-  }, []);
 
   const done = daily && progress.daily.date === daily.date ? progress.daily.done : [];
   const dateLabel = daily ? new Date(`${daily.date}T00:00:00`).toLocaleDateString(lang) : '';
