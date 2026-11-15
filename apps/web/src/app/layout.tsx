@@ -4,6 +4,7 @@ import { Providers } from '@/components/Providers';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { NicknameModal } from '@/components/NicknameModal';
+import { MobileNav } from '@/components/MobileNav';
 
 export const metadata: Metadata = {
   title: { default: 'GeoPlay · geo games', template: '%s · GeoPlay' },
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main>{children}</main>
           <Footer />
           <NicknameModal />
+          <MobileNav />
         </Providers>
       </body>
     </html>

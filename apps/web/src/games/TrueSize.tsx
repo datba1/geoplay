@@ -226,6 +226,13 @@ export function TrueSize({ ctx }: { ctx: GameContext }) {
   const startDragFromTray = (a2: string, e: React.PointerEvent) => {
     if (locked) return;
     e.preventDefault();
+    if (e.pointerType !== 'mouse') {
+      // Touch: the tray sits below the board, so drop the piece onto the frame; drag it from there.
+      const n = pieces.length;
+      setPieces((ps) => [...ps, { a2, x: W / 2 + ((n % 5) - 2) * 26, y: H / 2 + ((Math.floor(n / 5) % 3) - 1) * 26, rot: 0 }]);
+      setSelected(a2);
+      return;
+    }
     const p = toSvg(e.clientX, e.clientY);
     setPieces((ps) => [...ps, { a2, x: p.x, y: p.y, rot: 0 }]);
     setSelected(a2);

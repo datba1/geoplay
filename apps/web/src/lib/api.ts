@@ -1,5 +1,12 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
+/** The server answered with an error status (as opposed to being unreachable). */
+export class ApiError extends Error {
+  constructor(message: string, public status: number) {
+    super(message);
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
@@ -8,9 +15,19 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     const msg = Array.isArray(body.message) ? body.message.join(', ') : body.message;
-    throw new Error(msg || `Request failed (${res.status})`);
+    throw new ApiError(msg || `Request failed (${res.status})`, res.status);
   }
   return res.json() as Promise<T>;
+}
+
+/** Same rule as the API (apps/api/src/players/nickname.ts). */
+export const NICKNAME_PATTERN = /^[\p{L}\p{M}\p{N}\p{Extended_Pictographic}\u200d\ufe0f _.'\u2019!?&()\-]+$/u;
+export const cleanNickname = (v: string) => v.normalize('NFC').replace(/\s+/g, ' ').trim();
+export function nicknameProblem(v: string): 'short' | 'long' | 'chars' | null {
+  const n = cleanNickname(v);
+  if (n.length < 2) return 'short';
+  if (n.length > 24) return 'long';
+  return NICKNAME_PATTERN.test(n) ? null : 'chars';
 }
 
 export interface DailyChallenge {

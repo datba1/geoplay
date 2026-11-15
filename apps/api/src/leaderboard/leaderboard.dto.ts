@@ -1,4 +1,5 @@
 import { Transform, Type } from 'class-transformer';
+import { NICKNAME_MESSAGE, NICKNAME_PATTERN, cleanNickname } from '../players/nickname';
 import {
   IsBoolean, IsIn, IsInt, IsObject, IsOptional, IsString, IsUUID, Length, Matches, Max, Min,
 } from 'class-validator';
@@ -7,10 +8,10 @@ export class SubmitScoreDto {
   @IsUUID()
   playerId: string;
 
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }) => cleanNickname(value))
   @IsString()
   @Length(2, 24)
-  @Matches(/^[\p{L}\p{N} _.\-]+$/u)
+  @Matches(NICKNAME_PATTERN, { message: NICKNAME_MESSAGE })
   nickname: string;
 
   @IsString()

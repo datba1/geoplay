@@ -184,7 +184,8 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
 .stat-box small { display: block; font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
 .stat-box b { font-size: 18px; font-variant-numeric: tabular-nums; }
 .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
-@media (max-width: 960px) { .game-layout { grid-template-columns: 1fr; } }
+/* Some games set their side column inline; on small screens always stack. */
+@media (max-width: 960px) { .game-layout { grid-template-columns: 1fr !important; } }
 .board { position: relative; border-radius: var(--radius); border: 1px solid var(--line); background: radial-gradient(circle at 50% 40%, #121a31, #0a0f1d); overflow: hidden; touch-action: none; user-select: none; }
 .side { display: flex; flex-direction: column; gap: 12px; }
 .tray { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; max-height: 420px; overflow: auto; padding-right: 4px; }
@@ -336,3 +337,41 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
 .el-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--bg-2); font-size: 13px; }
 .el-chip span { font-size: 17px; }
 .el-chip:hover, .el-chip.on { border-color: var(--accent); background: rgba(255,122,80,0.1); }
+
+/* ---------- mobile ---------- */
+.mobile-nav { display: none; }
+@media (max-width: 860px) {
+  body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  .mobile-nav {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    background: rgba(7, 11, 20, 0.92); backdrop-filter: blur(14px); border-top: 1px solid var(--line);
+  }
+  .mobile-nav a { display: grid; justify-items: center; gap: 2px; padding: 4px 0; border-radius: 10px; font-size: 10px; color: var(--muted); }
+  .mobile-nav a span { font-size: 19px; line-height: 1.2; }
+  .mobile-nav a.active { color: var(--text); background: rgba(255,255,255,0.06); }
+  .header-inner { height: 56px; gap: 8px; }
+  .logo-sub { display: none; }
+  .game-top { padding-top: 12px; gap: 8px; }
+  .game-top h1 { font-size: 26px; }
+  .section { margin: 24px 0; }
+  .section-head h2 { font-size: 24px; }
+  .card { padding: 16px; }
+  .footer-grid > div:nth-child(2) { display: none; } /* long game list: the tab bar covers it */
+  .hero { padding-top: 16px; }
+  .hero .tagline { font-size: 21px; }
+  .tray { max-height: 260px; }
+  .modal { padding: 20px; }
+  .mixer { gap: 8px; }
+  .mix-slot { width: 76px; height: 76px; }
+  .mix-slot span { font-size: 30px; }
+  .lb-table td, .lb-table th { padding: 10px 6px; }
+}
+@media (max-width: 420px) {
+  .container { width: calc(100% - 20px); }
+  .stat-box { min-width: 0; padding: 6px 8px; }
+  .stat-box b { font-size: 16px; }
+  .daily h3 { font-size: 21px; }
+  .icon-btn { width: 34px; height: 34px; }
+}

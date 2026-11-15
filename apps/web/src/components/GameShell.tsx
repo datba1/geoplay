@@ -120,6 +120,9 @@ export function GameShell({ slug, rules, stats, children }: Props) {
             <p className="small muted">
               {result.res.submitted === 'ok' && `✓ ${t('result.submitted')}`}
               {result.res.submitted === 'offline' && t('result.offline')}
+              {result.res.submitted === 'rejected' && (
+                <button className="btn btn-sm btn-ghost" onClick={openNicknameModal}>{t('result.rejected')}</button>
+              )}
               {result.res.submitted === 'no-nickname' && (
                 <button className="btn btn-sm btn-ghost" onClick={openNicknameModal}>{t('result.noNick')}</button>
               )}

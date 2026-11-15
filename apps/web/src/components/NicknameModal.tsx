@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useProgress } from '@/lib/progress';
+import { nicknameProblem } from '@/lib/api';
 
 /** Asks for a nickname on the first visit, or whenever `open` is forced via the event. */
 export function NicknameModal() {
@@ -10,7 +11,8 @@ export function NicknameModal() {
   const { progress, ready, setNickname, dismissNickname } = useProgress();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
-  const [note, setNote] = useState<string | null>(null);
+  const [note, setNote] = useState<{ text: string; kind: 'error' | 'info' } | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (ready && !progress.nicknameAsked) setOpen(true);
@@ -27,13 +29,17 @@ export function NicknameModal() {
   }, [progress.nickname]);
 
   if (!open) return null;
-  const valid = value.trim().length >= 2;
+  const problem = nicknameProblem(value);
+  const valid = problem === null;
 
   const save = async () => {
-    if (!valid) return;
-    const ok = await setNickname(value);
-    if (ok) setOpen(false);
-    else setNote(t('nick.offline'));
+    if (!valid || saving) return;
+    setSaving(true);
+    const res = await setNickname(value);
+    setSaving(false);
+    if (res.status === 'ok') setOpen(false);
+    else if (res.status === 'offline') setNote({ text: t('nick.offline'), kind: 'info' });
+    else setNote({ text: t('nick.rejected'), kind: 'error' });
   };
 
   return (
@@ -47,13 +53,15 @@ export function NicknameModal() {
           maxLength={24}
           placeholder={t('nick.placeholder')}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => { setValue(e.target.value); setNote(null); }}
           onKeyDown={(e) => e.key === 'Enter' && save()}
         />
-        {note && <p className="small" style={{ color: 'var(--accent-2)' }}>{note}</p>}
+        {value.trim() && problem === 'chars' && <p className="small pill-bad">{t('nick.chars')}</p>}
+        {problem === 'long' && <p className="small pill-bad">{t('nick.long')}</p>}
+        {note && <p className={`small ${note.kind === 'error' ? 'pill-bad' : ''}`} style={note.kind === 'info' ? { color: 'var(--accent-2)' } : undefined}>{note.text}</p>}
         <div className="row" style={{ marginTop: 16 }}>
           <button className="btn" style={{ flex: 1 }} onClick={() => { dismissNickname(); setOpen(false); }}>{t('nick.later')}</button>
-          <button className="btn btn-primary" style={{ flex: 1 }} disabled={!valid} onClick={save}>{t('nick.save')}</button>
+          <button className="btn btn-primary" style={{ flex: 1 }} disabled={!valid || saving} onClick={save}>{saving ? '…' : t('nick.save')}</button>
         </div>
       </div>
     </div>

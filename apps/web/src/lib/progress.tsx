@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { api } from './api';
+import { api, ApiError, cleanNickname } from './api';
 import { gameMeta } from './games';
 
 /* ---------------- levels ---------------- */
@@ -136,13 +136,13 @@ export interface FinishResult {
   newStamps: string[];
   dailyCompleted: boolean;
   streak: number;
-  submitted: 'ok' | 'offline' | 'no-nickname';
+  submitted: 'ok' | 'offline' | 'rejected' | 'no-nickname';
 }
 
 interface ProgressCtx {
   progress: Progress;
   ready: boolean;
-  setNickname: (name: string) => Promise<boolean>;
+  setNickname: (name: string) => Promise<{ status: 'ok' | 'offline' } | { status: 'invalid'; message: string }>;
   dismissNickname: () => void;
   finishGame: (input: FinishInput) => Promise<FinishResult>;
   reset: () => void;
@@ -178,13 +178,17 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setNickname = useCallback(async (name: string) => {
-    const nickname = name.trim().slice(0, 24);
-    save({ ...ref.current, nickname, nicknameAsked: true });
+    const nickname = cleanNickname(name);
     try {
       await api.setNickname(ref.current.playerId, nickname);
-      return true;
-    } catch {
-      return false;
+      save({ ...ref.current, nickname, nicknameAsked: true });
+      return { status: 'ok' as const };
+    } catch (e) {
+      // The server rejected it: don't keep a nickname that can never be submitted.
+      if (e instanceof ApiError && e.status >= 400 && e.status < 500) return { status: 'invalid' as const, message: e.message };
+      // Unreachable: keep it locally, scores will be sent when the server is back.
+      save({ ...ref.current, nickname, nicknameAsked: true });
+      return { status: 'offline' as const };
     }
   }, [save]);
 
@@ -242,8 +246,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           meta: input.meta,
         });
         submitted = 'ok';
-      } catch {
-        submitted = 'offline';
+      } catch (e) {
+        submitted = e instanceof ApiError && e.status >= 400 && e.status < 500 ? 'rejected' : 'offline';
       }
     }
 
