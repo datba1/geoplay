@@ -607,3 +607,15 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
 .nav-icon { flex: none; }
 .nav a:not(.active) .nav-icon { opacity: 0.85; }
 .mobile-nav .nav-icon { display: block; margin: 0 auto 2px; }
+
+/* header: keep labels on one line, tighten as space runs out */
+.nav a, .logo-sub, .player-meta b, .player-meta span { white-space: nowrap; }
+.nav { flex-shrink: 1; min-width: 0; }
+@media (max-width: 1240px) {
+  .nav a { padding: 6px 10px; gap: 5px; }
+  .logo-sub { display: none; }
+}
+@media (max-width: 1080px) {
+  .player-meta { display: none; }
+  .nav a .nav-icon { display: none; }
+}
