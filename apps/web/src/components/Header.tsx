@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useI18n, LANGS } from '@/lib/i18n';
 import { levelInfo, useProgress } from '@/lib/progress';
 import { LogoMark } from './Logo';
+import { RankMedal } from './RankMedal';
 
 export function Header() {
   const { t, lang, setLang } = useI18n();
@@ -45,7 +46,7 @@ export function Header() {
         </button>
         <Link href="/leaderboard" className="icon-btn" title={t('nav.leaderboard')}>🏆</Link>
         <Link href="/collection" className="player-chip">
-          <span className={`medal ${info.tier}`}>{info.level}</span>
+          <RankMedal tier={info.tier} level={info.level} size={34} />
           <span className="player-meta">
             <b>{progress.nickname ?? 'Traveller'}</b>
             <span>{t('player.level', { level: info.level, tier: t(`tier.${info.tier}`), stamps: progress.stamps.length })}</span>

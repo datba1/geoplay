@@ -7,7 +7,7 @@ import { NicknameModal } from '@/components/NicknameModal';
 import { MobileNav } from '@/components/MobileNav';
 
 export const metadata: Metadata = {
-  title: { default: 'GeoPlay · geo games', template: '%s · GeoPlay' },
+  title: { default: 'GeoPlay', template: '%s · GeoPlay' },
   description: 'Geography games about maps, flags and true sizes. See the world from a new angle.',
   icons: { icon: '/favicon.svg' },
 };
