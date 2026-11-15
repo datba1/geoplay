@@ -5,29 +5,46 @@ import { api, cacheKeys, type Fact } from '@/lib/api';
 import { TTL, useCached } from '@/lib/cache';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n';
+import { useProgress } from '@/lib/progress';
+
+const TRY_GAME: Record<string, string> = {
+  general: 'diplomacy', size: 'true-size', maps: 'warped-map', flags: 'flag-fault', borders: 'border-chess', nature: 'shadow-hunt',
+};
 
 const CATEGORY_ICON: Record<string, string> = {
   general: '🌍', size: '📏', maps: '🗺️', flags: '🚩', borders: '🧱', nature: '🏔️',
 };
 
-export function FactFlip({ fact }: { fact: Fact }) {
+export function FactFlip({ fact, startFlipped = false }: { fact: Fact; startFlipped?: boolean }) {
   const { t } = useI18n();
-  const [flipped, setFlipped] = useState(false);
-  useEffect(() => setFlipped(false), [fact.id]);
+  const { collectCard } = useProgress();
+  const [flipped, setFlipped] = useState(startFlipped);
+  useEffect(() => setFlipped(startFlipped), [fact.id, startFlipped]);
+  const toggle = () => {
+    if (!flipped) collectCard(fact.id);
+    setFlipped((f) => !f);
+  };
   const icon = CATEGORY_ICON[fact.category] ?? '🌍';
   return (
-    <div className={`flip ${flipped ? 'flipped' : ''}`} onClick={() => setFlipped((f) => !f)}>
+    <div className={`flip ${flipped ? 'flipped' : ''}`} onClick={toggle}>
       <div className="flip-inner">
         <div className="flip-face">
-          <span className="eyebrow">{icon} {fact.category}</span>
+          <span className="eyebrow">{icon} {t(`factcat.${fact.category}`)}</span>
           <h3>{fact.question}</h3>
           <span className="muted small" style={{ marginTop: 'auto' }}>↻ {t('fact.flip')}</span>
         </div>
         <div className="flip-face flip-back">
-          <span className="eyebrow">{icon} {fact.category}</span>
+          <span className="eyebrow">{icon} {t(`factcat.${fact.category}`)}</span>
           <h3 className="accent-text">{fact.answer}</h3>
           <p className="muted" style={{ margin: 0 }}>{fact.detail}</p>
-          {fact.source && <span className="small muted" style={{ marginTop: 'auto' }}>{t('fact.source', { s: fact.source })}</span>}
+          <div className="flip-foot">
+            {TRY_GAME[fact.category] && (
+              <Link href={`/games/${TRY_GAME[fact.category]}`} className="chip chip-link small" onClick={(e) => e.stopPropagation()}>
+                {t('fact.tryIt', { game: t(`game.${TRY_GAME[fact.category]}.name`) })}
+              </Link>
+            )}
+            {fact.source && <span className="small muted">{t('fact.source', { s: fact.source })}</span>}
+          </div>
         </div>
       </div>
     </div>

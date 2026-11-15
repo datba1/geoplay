@@ -19,6 +19,28 @@ export function levelInfo(xp: number) {
   return { level, into: xp - base, need, tier: tier as 'bronze' | 'silver' | 'gold' | 'platinum' };
 }
 
+/* ---------------- ranks ---------------- */
+
+export const TIER_START = { bronze: 1, silver: 5, gold: 10, platinum: 20 } as const;
+export const nextTier = (tier: keyof typeof TIER_START) =>
+  tier === 'bronze' ? 'silver' : tier === 'silver' ? 'gold' : tier === 'gold' ? 'platinum' : null;
+
+const RANKS: { from: number; en: string; vi: string }[] = [
+  { from: 1, en: 'Trainee', vi: 'Học viên' },
+  { from: 3, en: 'Scout', vi: 'Trinh sát' },
+  { from: 5, en: 'Wayfinder', vi: 'Người dẫn lối' },
+  { from: 7, en: 'Navigator', vi: 'Hoa tiêu' },
+  { from: 10, en: 'Cartographer', vi: 'Nhà vẽ bản đồ' },
+  { from: 15, en: 'Explorer', vi: 'Nhà thám hiểm' },
+  { from: 20, en: 'Voyager', vi: 'Lữ khách đại dương' },
+  { from: 30, en: 'Legend', vi: 'Huyền thoại' },
+];
+export function rankTitle(level: number, lang: 'en' | 'vi') {
+  const r = [...RANKS].reverse().find((x) => level >= x.from) ?? RANKS[0];
+  return r[lang];
+}
+export const bestStreak = (p: { streak: { count: number; best?: number } }) => Math.max(p.streak.best ?? 0, p.streak.count);
+
 /* ---------------- state ---------------- */
 
 export interface GameStats { plays: number; best: number }
@@ -33,8 +55,10 @@ export interface Progress {
   badges: string[];
   games: Record<string, GameStats>;
   daily: { date: string | null; done: string[] };
-  streak: { count: number; last: string | null };
+  streak: { count: number; last: string | null; best?: number };
   flags: Record<string, boolean>;
+  /** Fact card ids the player has flipped. */
+  cards: number[];
 }
 
 const STORAGE_KEY = 'geoplay.progress.v1';
@@ -59,6 +83,7 @@ const fresh = (): Progress => ({
   daily: { date: null, done: [] },
   streak: { count: 0, last: null },
   flags: {},
+  cards: [],
 });
 
 /* ---------------- badges ---------------- */
@@ -75,7 +100,7 @@ const totalPlays = (p: Progress) => Object.values(p.games).reduce((s, g) => s + 
 
 export const BADGES: BadgeDef[] = [
   { id: 'departure', icon: '🛫', name: { en: 'Departure', vi: 'Khởi hành' }, desc: { en: 'Finish your first game', vi: 'Hoàn thành trò chơi đầu tiên' }, test: (p) => totalPlays(p) >= 1 },
-  { id: 'explorer', icon: '🧭', name: { en: 'Explorer', vi: 'Nhà thám hiểm' }, desc: { en: 'Play all three games', vi: 'Chơi cả ba trò chơi' }, test: (p) => ['true-size', 'flag-fault', 'border-sketch'].every((s) => (p.games[s]?.plays ?? 0) > 0) },
+  { id: 'explorer', icon: '🧭', name: { en: 'Explorer', vi: 'Nhà thám hiểm' }, desc: { en: 'Play True Size, Flag Fault and Border Sketch', vi: 'Chơi Đúng Kích Thước, Lỗi Quốc Kỳ và Phác Biên Giới' }, test: (p) => ['true-size', 'flag-fault', 'border-sketch'].every((s) => (p.games[s]?.plays ?? 0) > 0) },
   { id: 'stamps-10', icon: '📮', name: { en: 'Postcard', vi: 'Bưu thiếp' }, desc: { en: 'Collect 10 stamps', vi: 'Sưu tầm 10 con dấu' }, test: (p) => p.stamps.length >= 10 },
   { id: 'stamps-30', icon: '🗺️', name: { en: 'Globetrotter', vi: 'Du mục' }, desc: { en: 'Collect 30 stamps', vi: 'Sưu tầm 30 con dấu' }, test: (p) => p.stamps.length >= 30 },
   { id: 'stamps-75', icon: '🌏', name: { en: 'Cartographer', vi: 'Người vẽ bản đồ' }, desc: { en: 'Collect 75 stamps', vi: 'Sưu tầm 75 con dấu' }, test: (p) => p.stamps.length >= 75 },
@@ -146,6 +171,7 @@ interface ProgressCtx {
   setNickname: (name: string) => Promise<{ status: 'ok' | 'offline' } | { status: 'invalid'; message: string }>;
   dismissNickname: () => void;
   finishGame: (input: FinishInput) => Promise<FinishResult>;
+  collectCard: (id: number) => void;
   reset: () => void;
 }
 
@@ -195,6 +221,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
   const dismissNickname = useCallback(() => save({ ...ref.current, nicknameAsked: true }), [save]);
 
+  const collectCard = useCallback(
+    (id: number) => {
+      if (!ref.current.cards.includes(id)) save({ ...ref.current, cards: [...ref.current.cards, id] });
+    },
+    [save],
+  );
+
   const finishGame = useCallback(async (input: FinishInput): Promise<FinishResult> => {
     const before = ref.current;
     const meta = gameMeta(input.slug);
@@ -219,6 +252,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           count: streak.last === previousDay(input.daily.date) ? streak.count + 1 : streak.last === input.daily.date ? streak.count : 1,
           last: input.daily.date,
         };
+        streak.best = Math.max(before.streak.best ?? before.streak.count, streak.count);
       }
     }
 
@@ -271,8 +305,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   }, [save]);
 
   const value = useMemo(
-    () => ({ progress, ready, setNickname, dismissNickname, finishGame, reset }),
-    [progress, ready, setNickname, dismissNickname, finishGame, reset],
+    () => ({ progress, ready, setNickname, dismissNickname, finishGame, collectCard, reset }),
+    [progress, ready, setNickname, dismissNickname, finishGame, collectCard, reset],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

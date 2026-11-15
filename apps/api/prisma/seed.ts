@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client';
+import { extraFacts } from './facts-extra';
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
@@ -171,9 +172,15 @@ const facts: FactSeed[] = [
 ];
 
 async function main() {
-  await prisma.fact.deleteMany();
-  await prisma.fact.createMany({ data: facts });
-  console.log(`Seeded ${facts.length} facts`);
+  // Stable ids (1..n) so cards players have collected keep pointing at the same fact.
+  const all = [...facts, ...extraFacts];
+  for (const [i, f] of all.entries()) {
+    const data = { ...f, source: f.source ?? null };
+    await prisma.fact.upsert({ where: { id: i + 1 }, create: { id: i + 1, ...data }, update: data });
+  }
+  await prisma.fact.deleteMany({ where: { id: { gt: all.length } } });
+  await prisma.$executeRawUnsafe(`SELECT setval(pg_get_serial_sequence('"Fact"', 'id'), ${all.length})`);
+  console.log(`Seeded ${all.length} facts`);
 }
 
 main()
