@@ -696,7 +696,7 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
 .fo-res small.down, .fo-effects .down { color: var(--red); }
 .fo-stab-bar { width: 54px; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.08); overflow: hidden; }
 .fo-stab-bar span { display: block; height: 100%; background: linear-gradient(90deg, #9f87e8, #c9b6ff); }
-.fo-main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; align-items: start; }
+.fo-main { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 12px; align-items: start; }
 .fo-map { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--line-2); box-shadow: 0 18px 40px rgba(0,0,0,0.35); }
 .fo-map svg { display: block; width: 100%; height: auto; }
 .fo-prov { cursor: pointer; }
@@ -753,4 +753,98 @@ em.accent, .accent-text { color: var(--accent); font-style: italic; }
 @media (max-width: 960px) {
   .fo-main { grid-template-columns: 1fr; }
   .fo-side { max-height: none; }
+}
+
+/* Founders: fantasy atlas map */
+.fo-map { border-color: #6b5434; box-shadow: 0 0 0 4px #2a2014, 0 0 0 5px #8a6c40, 0 22px 50px rgba(0,0,0,0.45); }
+.fm { position: relative; }
+.fm > svg { display: block; width: 100%; height: auto; max-height: calc(100vh - 210px); min-height: 420px; touch-action: none; cursor: grab; user-select: none; background: #e3d4ae; }
+.fm > svg.dragging { cursor: grabbing; }
+.fm-prov { cursor: pointer; }
+.fm-prov:hover { fill: rgba(255,248,225,0.22); }
+.fm-mark path, .fm-mark circle { fill: none; stroke: #4a3a28; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.fm-mark .fm-shade { fill: rgba(74,58,40,0.35); stroke: none; }
+.fm-mark .fm-tree { fill: #557a4a; stroke: #3a3020; }
+.fm-mark .fm-dot { fill: #4a3a28; stroke: none; }
+.fm-name { font-family: var(--font-display); font-style: italic; font-weight: 600; fill: #2e2214; paint-order: stroke; stroke: rgba(240,230,205,0.85); stroke-width: 3px; letter-spacing: 0.02em; }
+.fm-capital { font-style: normal; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.fm-compass circle { stroke: #6b5434; stroke-width: 1.4; }
+.fm-compass .dark { fill: #5a4428; }
+.fm-compass .light { fill: #efe2bf; stroke: #5a4428; stroke-width: 1; }
+.fm-compass text { font: 700 16px var(--font-display); fill: #5a4428; }
+.fm-fog { animation: fm-drift 40s ease-in-out infinite alternate; }
+@keyframes fm-drift { from { transform: translateX(-30px); } to { transform: translateX(30px); } }
+@media (prefers-reduced-motion: reduce) { .fm-fog { animation: none; } }
+.fm-zoom { position: absolute; right: 12px; bottom: 12px; display: grid; gap: 6px; }
+.fm-zoom button {
+  width: 38px; height: 38px; border-radius: 10px; border: 1px solid #6b5434; background: rgba(42,32,20,0.88); color: #f3e6c4;
+  font-size: 20px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.fm-zoom button:hover { background: #3a2c1a; }
+
+/* ================= immersive games (full window) ================= */
+html.immersive-lock, html.immersive-lock body { overflow: hidden; }
+.game-immersive {
+  position: fixed; inset: 0; z-index: 80; display: flex; flex-direction: column; gap: 8px;
+  padding: 8px 12px 12px; background: radial-gradient(1200px 500px at 50% -10%, #1a1630, var(--bg) 60%);
+}
+.game-immersive > .game-top { margin: 0; flex: none; }
+.game-immersive > .game-top h1 { font-size: 24px; }
+.game-immersive > .fo { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.game-immersive .fo-bar { flex: none; padding: 6px 10px; }
+.game-immersive .fo-main { flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) 340px; }
+.game-immersive .fo-map { height: 100%; min-height: 0; }
+.game-immersive .fm { height: 100%; }
+.game-immersive .fm > svg { width: 100%; height: 100%; max-height: none; min-height: 0; }
+.game-immersive .fo-side { height: 100%; max-height: none; min-height: 0; align-content: start; }
+@media (max-width: 960px) {
+  .game-immersive { overflow: auto; }
+  .game-immersive > .fo { flex: none; }
+  .game-immersive .fo-main { grid-template-columns: 1fr; }
+  .game-immersive .fo-map { height: 62vh; }
+  .game-immersive .fo-side { height: auto; }
+}
+@media (max-width: 600px) { .hide-sm { display: none; } }
+
+/* Founders: full-bleed map with a docked panel */
+.game-immersive { padding: 0; gap: 0; }
+.game-immersive > .game-top { padding: 8px 14px; border-bottom: 1px solid var(--line); background: rgba(8,11,22,0.92); }
+.game-immersive > .fo { gap: 0; }
+.game-immersive .fo-main { gap: 0; grid-template-columns: minmax(0, 1fr) 360px; }
+.game-immersive .fo-map { border: 0; border-radius: 0; box-shadow: none; }
+.game-immersive .fm > svg { background: #e2d5b2; }
+.game-immersive .fo-side { border-radius: 0; border: 0; border-left: 1px solid var(--line); padding: 12px 14px; background: #0b1020; }
+.fm-zoom { top: auto; }
+.fo-float { position: absolute; left: 12px; top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fo-float-season {
+  display: inline-flex; align-items: baseline; gap: 6px; padding: 7px 12px; border-radius: 999px;
+  background: rgba(20,16,10,0.82); color: #f3e8cc; font-size: 13.5px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.fo-float-season b { font: 600 15px var(--font-display); color: #f5d27a; }
+.fo-float-season small { color: rgba(243,232,204,0.6); font-size: 11.5px; margin-left: 2px; }
+.fo-float-end {
+  padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(245,210,122,0.7); cursor: pointer; font-weight: 700; font-size: 13.5px;
+  background: rgba(40,28,10,0.88); color: #f5d27a; box-shadow: 0 0 0 3px rgba(245,210,122,0.18), 0 4px 12px rgba(0,0,0,0.25);
+}
+.fo-float-end:hover { background: rgba(70,48,14,0.92); }
+.fo-tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.fo-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border-radius: 10px;
+  border: 1px solid var(--line); background: rgba(255,255,255,0.03); font-variant-numeric: tabular-nums;
+}
+.fo-tile b { font-size: 16px; line-height: 1.1; }
+.fo-tile small { font-size: 10.5px; font-weight: 600; }
+.fo-tile small.up { color: var(--green); } .fo-tile small.down { color: var(--red); }
+.fo-mandate { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+.fo-mandate-bar { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,0.08); overflow: hidden; }
+.fo-mandate-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f5c45c, #fde68a); }
+.fm-name { font-family: var(--font-body, system-ui); font-style: normal; font-weight: 700; fill: #3a2c1a; stroke: rgba(240,232,210,0.8); stroke-width: 3px; letter-spacing: 0.01em; }
+.fm-capital { font-family: var(--font-display); font-style: italic; text-transform: none; letter-spacing: 0.02em; }
+
+.fo-found { top: auto; bottom: 16px; }
+@media (max-width: 600px) { .fo-found { padding: 10px 12px; } .fo-found p { display: none; } }
+@media (max-width: 960px) {
+  .game-immersive .fo-main { grid-template-columns: 1fr; }
+  .game-immersive .fo-map { height: 62vh; }
+  .game-immersive .fo-side { height: auto; border-left: 0; border-top: 1px solid var(--line); }
 }

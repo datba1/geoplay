@@ -31,12 +31,14 @@ interface Props {
   slug: string;
   rules: string[];
   stats?: ReactNode;
+  /** Take over the whole window (site header/footer hidden). */
+  immersive?: boolean;
   children: (ctx: GameContext) => ReactNode;
 }
 
 const DAILY_GAME_COUNT = 3;
 
-export function GameShell({ slug, rules, stats, children }: Props) {
+export function GameShell({ slug, rules, stats, immersive, children }: Props) {
   const { t, lang } = useI18n();
   const { finishGame } = useProgress();
   const params = useSearchParams();
@@ -138,7 +140,8 @@ export function GameShell({ slug, rules, stats, children }: Props) {
   );
 
   return (
-    <div className="container">
+    <div className={immersive ? 'game-immersive' : 'container'}>
+      {immersive && <ImmersiveLock />}
       <div className="game-top">
         <Link href="/games" className="btn btn-sm btn-ghost">{t('common.back')}</Link>
         <h1>{t(gameName(slug))}</h1>
@@ -147,6 +150,7 @@ export function GameShell({ slug, rules, stats, children }: Props) {
         {bonus.combo >= 2 && (
           <span key={bonus.combo} className="combo-chip" title={t('depth.combo')}>⚡ ×{bonus.combo}</span>
         )}
+        {immersive && <FullscreenButton />}
         <div className="segmented diff-picker" role="radiogroup" aria-label={t('depth.difficulty')} title={isDaily ? t('depth.dailyNormal') : undefined}>
           {DIFFICULTIES.map((d) => (
             <button key={d} role="radio" aria-checked={difficulty === d} className={difficulty === d ? 'on' : ''} disabled={isDaily} onClick={() => changeDifficulty(d)}>
@@ -214,5 +218,35 @@ export function GameShell({ slug, rules, stats, children }: Props) {
         </div>
       )}
     </div>
+  );
+}
+
+/** Stops the page behind an immersive game from scrolling. */
+function ImmersiveLock() {
+  useEffect(() => {
+    document.documentElement.classList.add('immersive-lock');
+    return () => document.documentElement.classList.remove('immersive-lock');
+  }, []);
+  return null;
+}
+
+/** Toggles real browser fullscreen. */
+function FullscreenButton() {
+  const { t } = useI18n();
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const sync = () => setOn(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', sync);
+    return () => document.removeEventListener('fullscreenchange', sync);
+  }, []);
+  if (typeof document !== 'undefined' && !document.fullscreenEnabled) return null;
+  const toggle = () => {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else document.documentElement.requestFullscreen().catch(() => {});
+  };
+  return (
+    <button className="btn btn-sm btn-ghost" onClick={toggle} title={on ? t('common.exitFullscreen') : t('common.fullscreen')}>
+      {on ? '⤡' : '⤢'} <span className="hide-sm">{on ? t('common.exitFullscreen') : t('common.fullscreen')}</span>
+    </button>
   );
 }

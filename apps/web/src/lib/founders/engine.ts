@@ -7,8 +7,8 @@ import { mulberry32, shuffle } from '@/lib/rng';
 import type { Difficulty } from '@/lib/progress';
 import { PETITIONS, type Effects, type Petition } from './petitions';
 
-export const MAP_W = 900;
-export const MAP_H = 620;
+export const MAP_W = 1500;
+export const MAP_H = 1000;
 export const SEASONS = 16; // four years
 
 export type Terrain = 'plains' | 'forest' | 'hills' | 'mountains' | 'desert' | 'marsh';
@@ -198,8 +198,8 @@ export function generate(seed: number, difficulty: Difficulty): State {
 
   // Jittered grid of sites.
   const pts: [number, number][] = [];
-  const COLS = 15;
-  const ROWS = 11;
+  const COLS = 22;
+  const ROWS = 15;
   for (let j = 0; j < ROWS; j++)
     for (let i = 0; i < COLS; i++)
       pts.push([((i + 0.2 + rand() * 0.6) / COLS) * MAP_W, ((j + 0.2 + rand() * 0.6) / ROWS) * MAP_H]);
@@ -242,7 +242,7 @@ export function generate(seed: number, difficulty: Difficulty): State {
     if (comp[i] !== best) continue;
     const e = elevation[i];
     const m = moist(pts[i][0] / MAP_W, pts[i][1] / MAP_H);
-    const terrain: Terrain = e > 0.62 ? 'mountains' : e > 0.45 ? 'hills' : m < 0.3 ? 'desert' : m > 0.68 ? (e < 0.25 ? 'marsh' : 'forest') : m > 0.52 ? 'forest' : 'plains';
+    const terrain: Terrain = e > 0.72 ? 'mountains' : e > 0.5 ? 'hills' : m < 0.3 ? 'desert' : m > 0.68 ? (e < 0.25 ? 'marsh' : 'forest') : m > 0.52 ? 'forest' : 'plains';
     const poly = (vor.cellPolygon(i) ?? []).map(([x, y]) => [Math.round(x * 10) / 10, Math.round(y * 10) / 10] as [number, number]);
     ids.set(i, provinces.length);
     provinces.push({
