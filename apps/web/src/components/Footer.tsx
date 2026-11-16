@@ -3,6 +3,12 @@
 import Link from 'next/link';
 import { useI18n, LANGS } from '@/lib/i18n';
 import { GAMES, gameName } from '@/lib/games';
+import { CATEGORIES } from './GameGrid';
+
+const playable = GAMES.filter((g) => g.implemented);
+/** Most recently added games, newest first. */
+const NEWEST = ['founders', 'north-south', 'capital-pin'];
+const CAT_COLOR: Record<string, string> = { maps: '#fbbf24', flags: '#fb7185', data: '#60a5fa', strategy: '#a78bfa', nature: '#4fd1a1' };
 import { LogoMark } from './Logo';
 
 export function Footer() {
@@ -27,9 +33,20 @@ export function Footer() {
         <div>
           <h4>{t('nav.games')}</h4>
           <ul className="footer-games">
-            <li><Link href="/games"><b>{t('gp.all')} →</b></Link></li>
-            {GAMES.filter((g) => g.implemented).map((g) => (
-              <li key={g.slug}><Link href={`/games/${g.slug}`}><i className="dot" style={{ background: g.accent }} />{t(gameName(g.slug))}</Link></li>
+            <li><Link href="/games"><b>{t('gp.all')} ({playable.length}) →</b></Link></li>
+            {CATEGORIES.map((c) => (
+              <li key={c}>
+                <Link href={`/games?cat=${c}`}>
+                  <i className="dot" style={{ background: CAT_COLOR[c] }} />
+                  {t(`games.${c}`)} <span className="muted">· {playable.filter((g) => g.category === c).length}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <h5 className="footer-sub">{t('footer.newGames')}</h5>
+          <ul className="footer-games">
+            {NEWEST.map((slug) => (
+              <li key={slug}><Link href={`/games/${slug}`}>{t(gameName(slug))}</Link></li>
             ))}
           </ul>
         </div>

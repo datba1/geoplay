@@ -917,3 +917,5 @@ html.immersive-lock, html.immersive-lock body { overflow: hidden; }
 .game-immersive > .game-top h1 { font-family: var(--medieval); font-weight: 700; font-style: normal; color: #f0d58f; letter-spacing: 0.02em; }
 
 .combo-chip { gap: 3px; }
+
+.footer-sub { margin: 14px 0 6px; font-size: 12px; font-weight: 700; color: var(--muted); }

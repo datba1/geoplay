@@ -30,6 +30,9 @@ export default function GamesPage() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE) ?? 'null');
       if (saved) { setCat(saved.cat ?? 'all'); setDiff(saved.diff ?? 0); setLen(saved.len ?? 'any'); }
+      // A link like /games?cat=maps (from the footer) picks the category directly.
+      const fromUrl = new URLSearchParams(window.location.search).get('cat') as Cat | null;
+      if (fromUrl && (fromUrl === 'all' || CATEGORIES.includes(fromUrl as never))) { setCat(fromUrl); setDiff(0); setLen('any'); }
     } catch {}
   }, []);
   useEffect(() => {
