@@ -12,6 +12,8 @@ datasource db {
 model Player {
   id        String   @id @db.Uuid
   nickname  String   @db.VarChar(24)
+  /// Demo players created by prisma/seed-players.ts (removable with db:unseed-players)
+  seeded    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   scores    Score[]

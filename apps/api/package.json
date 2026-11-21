@@ -3,15 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prebuild": "prisma generate",
     "build": "nest build",
     "start": "node dist/main.js",
+    "prestart:dev": "prisma generate",
     "start:dev": "nest start --watch",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "prisma db seed",
     "postinstall": "prisma generate",
-    "data:worldbank": "ts-node prisma/fetch-worldbank.ts"
+    "data:worldbank": "ts-node prisma/fetch-worldbank.ts",
+    "db:seed-players": "ts-node prisma/seed-players.ts",
+    "db:unseed-players": "ts-node prisma/seed-players.ts --remove"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

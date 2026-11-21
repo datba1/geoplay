@@ -27,6 +27,7 @@ export type AggregatePlayer = {
 export type PlayerMinAggregateOutputType = {
   id: string | null
   nickname: string | null
+  seeded: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -34,6 +35,7 @@ export type PlayerMinAggregateOutputType = {
 export type PlayerMaxAggregateOutputType = {
   id: string | null
   nickname: string | null
+  seeded: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -41,6 +43,7 @@ export type PlayerMaxAggregateOutputType = {
 export type PlayerCountAggregateOutputType = {
   id: number
   nickname: number
+  seeded: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -50,6 +53,7 @@ export type PlayerCountAggregateOutputType = {
 export type PlayerMinAggregateInputType = {
   id?: true
   nickname?: true
+  seeded?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -57,6 +61,7 @@ export type PlayerMinAggregateInputType = {
 export type PlayerMaxAggregateInputType = {
   id?: true
   nickname?: true
+  seeded?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -64,6 +69,7 @@ export type PlayerMaxAggregateInputType = {
 export type PlayerCountAggregateInputType = {
   id?: true
   nickname?: true
+  seeded?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -144,6 +150,7 @@ export type PlayerGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 export type PlayerGroupByOutputType = {
   id: string
   nickname: string
+  seeded: boolean
   createdAt: Date
   updatedAt: Date
   _count: PlayerCountAggregateOutputType | null
@@ -172,6 +179,7 @@ export type PlayerWhereInput = {
   NOT?: Prisma.PlayerWhereInput | Prisma.PlayerWhereInput[]
   id?: Prisma.UuidFilter<"Player"> | string
   nickname?: Prisma.StringFilter<"Player"> | string
+  seeded?: Prisma.BoolFilter<"Player"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   scores?: Prisma.ScoreListRelationFilter
@@ -180,6 +188,7 @@ export type PlayerWhereInput = {
 export type PlayerOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   nickname?: Prisma.SortOrder
+  seeded?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   scores?: Prisma.ScoreOrderByRelationAggregateInput
@@ -191,6 +200,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PlayerWhereInput[]
   NOT?: Prisma.PlayerWhereInput | Prisma.PlayerWhereInput[]
   nickname?: Prisma.StringFilter<"Player"> | string
+  seeded?: Prisma.BoolFilter<"Player"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   scores?: Prisma.ScoreListRelationFilter
@@ -199,6 +209,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
 export type PlayerOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   nickname?: Prisma.SortOrder
+  seeded?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PlayerCountOrderByAggregateInput
@@ -212,6 +223,7 @@ export type PlayerScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PlayerScalarWhereWithAggregatesInput | Prisma.PlayerScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"Player"> | string
   nickname?: Prisma.StringWithAggregatesFilter<"Player"> | string
+  seeded?: Prisma.BoolWithAggregatesFilter<"Player"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Player"> | Date | string
 }
@@ -219,6 +231,7 @@ export type PlayerScalarWhereWithAggregatesInput = {
 export type PlayerCreateInput = {
   id: string
   nickname: string
+  seeded?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   scores?: Prisma.ScoreCreateNestedManyWithoutPlayerInput
@@ -227,6 +240,7 @@ export type PlayerCreateInput = {
 export type PlayerUncheckedCreateInput = {
   id: string
   nickname: string
+  seeded?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   scores?: Prisma.ScoreUncheckedCreateNestedManyWithoutPlayerInput
@@ -235,6 +249,7 @@ export type PlayerUncheckedCreateInput = {
 export type PlayerUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nickname?: Prisma.StringFieldUpdateOperationsInput | string
+  seeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scores?: Prisma.ScoreUpdateManyWithoutPlayerNestedInput
@@ -243,6 +258,7 @@ export type PlayerUpdateInput = {
 export type PlayerUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nickname?: Prisma.StringFieldUpdateOperationsInput | string
+  seeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scores?: Prisma.ScoreUncheckedUpdateManyWithoutPlayerNestedInput
@@ -251,6 +267,7 @@ export type PlayerUncheckedUpdateInput = {
 export type PlayerCreateManyInput = {
   id: string
   nickname: string
+  seeded?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -258,6 +275,7 @@ export type PlayerCreateManyInput = {
 export type PlayerUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nickname?: Prisma.StringFieldUpdateOperationsInput | string
+  seeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -265,6 +283,7 @@ export type PlayerUpdateManyMutationInput = {
 export type PlayerUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nickname?: Prisma.StringFieldUpdateOperationsInput | string
+  seeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -272,6 +291,7 @@ export type PlayerUncheckedUpdateManyInput = {
 export type PlayerCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nickname?: Prisma.SortOrder
+  seeded?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -279,6 +299,7 @@ export type PlayerCountOrderByAggregateInput = {
 export type PlayerMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nickname?: Prisma.SortOrder
+  seeded?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -286,6 +307,7 @@ export type PlayerMaxOrderByAggregateInput = {
 export type PlayerMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nickname?: Prisma.SortOrder
+  seeded?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -297,6 +319,10 @@ export type PlayerScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -320,6 +346,7 @@ export type PlayerUpdateOneRequiredWithoutScoresNestedInput = {
 export type PlayerCreateWithoutScoresInput = {
   id: string
   nickname: string
+  seeded?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -327,6 +354,7 @@ export type PlayerCreateWithoutScoresInput = {
 export type PlayerUncheckedCreateWithoutScoresInput = {
   id: string
   nickname: string
+  seeded?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -350,6 +378,7 @@ export type PlayerUpdateToOneWithWhereWithoutScoresInput = {
 export type PlayerUpdateWithoutScoresInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nickname?: Prisma.StringFieldUpdateOperationsInput | string
+  seeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -357,6 +386,7 @@ export type PlayerUpdateWithoutScoresInput = {
 export type PlayerUncheckedUpdateWithoutScoresInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nickname?: Prisma.StringFieldUpdateOperationsInput | string
+  seeded?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -395,6 +425,7 @@ export type PlayerCountOutputTypeCountScoresArgs<ExtArgs extends runtime.Types.E
 export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   nickname?: boolean
+  seeded?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   scores?: boolean | Prisma.Player$scoresArgs<ExtArgs>
@@ -404,6 +435,7 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type PlayerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   nickname?: boolean
+  seeded?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["player"]>
@@ -411,6 +443,7 @@ export type PlayerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type PlayerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   nickname?: boolean
+  seeded?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["player"]>
@@ -418,11 +451,12 @@ export type PlayerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type PlayerSelectScalar = {
   id?: boolean
   nickname?: boolean
+  seeded?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nickname" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
+export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nickname" | "seeded" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
 export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   scores?: boolean | Prisma.Player$scoresArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
@@ -438,6 +472,10 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     nickname: string
+    /**
+     * Demo players created by prisma/seed-players.ts (removable with db:unseed-players)
+     */
+    seeded: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["player"]>
@@ -866,6 +904,7 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
 export interface PlayerFieldRefs {
   readonly id: Prisma.FieldRef<"Player", 'String'>
   readonly nickname: Prisma.FieldRef<"Player", 'String'>
+  readonly seeded: Prisma.FieldRef<"Player", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Player", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Player", 'DateTime'>
 }
