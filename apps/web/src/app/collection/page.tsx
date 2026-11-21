@@ -7,6 +7,7 @@ import { countryName, flagUrl } from '@/lib/geo';
 import { CONTINENTS, PASSPORT_COUNTRIES, TOTAL_COUNTRIES } from '@/lib/continents';
 import { openNicknameModal } from '@/components/NicknameModal';
 import { RankMedal } from '@/components/RankMedal';
+import { PassportBook } from '@/components/PassportBook';
 import { BadgeMedal, ItemTag, type Metal } from '@/components/Medal';
 
 const BADGE_METAL: Record<string, Metal> = {
@@ -27,6 +28,7 @@ export default function CollectionPage() {
   const { t, lang } = useI18n();
   const { progress, reset } = useProgress();
   const [tab, setTab] = useState<Tab>('passport');
+  const [openCode, setOpenCode] = useState<string | null>(null);
   const info = levelInfo(progress.xp);
   const plays = Object.values(progress.games).reduce((s, g) => s + g.plays, 0);
   const stamped = useMemo(() => new Set(progress.stamps), [progress.stamps]);
@@ -118,7 +120,7 @@ export default function CollectionPage() {
                   </div>
                   <div className="page-bar"><div style={{ width: `${(got / c.codes.length) * 100}%`, background: INKS[c.id] }} /></div>
                   <div className="stamp-slots">
-                    {sorted.map((code) => <Stamp key={code} code={code} on={stamped.has(code)} ink={INKS[c.id]} name={countryName(code, lang)} />)}
+                    {sorted.map((code) => <Stamp key={code} code={code} on={stamped.has(code)} ink={INKS[c.id]} name={countryName(code, lang)} onOpen={setOpenCode} />)}
                   </div>
                 </article>
               );
@@ -127,7 +129,7 @@ export default function CollectionPage() {
               <article className="passport-page">
                 <div className="page-head"><h3>{t('col.territories')}</h3><span>{extra.length}</span></div>
                 <div className="stamp-slots">
-                  {extra.map((code) => <Stamp key={code} code={code} on ink={INKS.other} name={countryName(code, lang)} />)}
+                  {extra.map((code) => <Stamp key={code} code={code} on ink={INKS.other} name={countryName(code, lang)} onOpen={setOpenCode} />)}
                 </div>
               </article>
             )}
@@ -168,22 +170,31 @@ export default function CollectionPage() {
           })}
         </section>
       )}
+
+      {openCode && (
+        <PassportBook
+          code={openCode}
+          order={[...CONTINENTS.flatMap((c) => c.codes), ...extra]}
+          onNavigate={setOpenCode}
+          onClose={() => setOpenCode(null)}
+        />
+      )}
     </div>
   );
 }
 
-function Stamp({ code, on, ink, name }: { code: string; on: boolean; ink: string; name: string }) {
+function Stamp({ code, on, ink, name, onOpen }: { code: string; on: boolean; ink: string; name: string; onOpen: (code: string) => void }) {
   if (!on) {
     return (
-      <div className="slot" title={name}>
+      <button className="slot" title={name} onClick={() => onOpen(code)}>
         <span>{name}</span>
-      </div>
+      </button>
     );
   }
   return (
-    <div className="slot inked" title={name} style={{ ['--ink' as string]: ink, transform: `rotate(${tilt(code)}deg)` }}>
+    <button className="slot inked" title={name} onClick={() => onOpen(code)} style={{ ['--ink' as string]: ink, transform: `rotate(${tilt(code)}deg)` }}>
       <img src={flagUrl(code)} alt="" />
       <span>{name}</span>
-    </div>
+    </button>
   );
 }

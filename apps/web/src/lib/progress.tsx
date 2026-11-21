@@ -63,6 +63,8 @@ export interface Progress {
   nicknameAsked: boolean;
   xp: number;
   stamps: string[];
+  /** Per-country entry log: how many times stamped, first date (YYYY-MM-DD) and the game that gave it. */
+  stampLog?: Record<string, { n: number; first: string; game: string }>;
   badges: string[];
   games: Record<string, GameStats>;
   daily: { date: string | null; done: string[] };
@@ -278,10 +280,18 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    const stampLog = { ...before.stampLog };
+    const today = new Date().toISOString().slice(0, 10);
+    for (const code of new Set(input.stamps.map((s) => s.toUpperCase()))) {
+      const prev = stampLog[code];
+      stampLog[code] = prev ? { ...prev, n: prev.n + 1 } : { n: 1, first: today, game: input.slug };
+    }
+
     const next: Progress = {
       ...before,
       xp: before.xp + xpGained,
       stamps: [...before.stamps, ...newStamps],
+      stampLog,
       games: {
         ...before.games,
         [input.slug]: {
